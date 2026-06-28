@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "9.3.2",
-  "description": "NexaGest 9.3.2 - Atualizador Premium com novidades limpas e diagnóstico aprimorado",
+  "version": "10.5.0",
+  "description": "NexaGest 10.5 - BI PRO com painel executivo, Curva ABC, heatmap de vendas, comparativos e indicadores gerenciais",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -65,7 +65,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "9.3.2"
+      "version": "10.5.0"
     },
     "publish": [
       {
@@ -75,6 +75,6 @@
         "releaseType": "release"
       }
     ],
-    "buildVersion": "9.3.2"
+    "buildVersion": "10.5.0"
   }
 }
