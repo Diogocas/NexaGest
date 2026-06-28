@@ -1,5 +1,5 @@
 window.NEXAGEST_CONFIG = {
-  version:'9.2.1',
+  version:'9.3.2',
   name: 'NexaGest',
   release: 'Infraestrutura de distribuição e atualização automática',
   github: { owner: 'Diogocas', repo: 'NexaGest' },

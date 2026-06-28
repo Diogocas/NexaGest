@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "9.3.1",
-  "description": "NexaGest 9.3.1 - Publicador PRO e Atualizador PRO integrado",
+  "version": "9.3.2",
+  "description": "NexaGest 9.3.2 - Atualizador Premium com novidades limpas e diagnóstico aprimorado",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -65,7 +65,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "9.3.0"
+      "version": "9.3.2"
     },
     "publish": [
       {
@@ -74,6 +74,7 @@
         "repo": "NexaGest",
         "releaseType": "release"
       }
-    ]
+    ],
+    "buildVersion": "9.3.2"
   }
 }
