@@ -15,3 +15,7 @@ Na Release do GitHub envie estes arquivos:
 - `NexaGest-Setup.exe.blockmap`
 
 Não envie a pasta `dist/` para o repositório.
+
+
+## 9.1.1
+O formato oficial de atualização é `latest.yml`, gerado automaticamente pelo electron-builder. O antigo `latest.json` não é mais usado.

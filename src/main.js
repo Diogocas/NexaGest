@@ -451,6 +451,8 @@ function configureAutoUpdater(payload = {}) {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.allowPrerelease = false;
+  autoUpdater.allowDowngrade = false;
+  autoUpdater.fullChangelog = true;
   autoUpdater.logger = console;
 
   const owner = String(payload.githubOwner || payload.owner || 'Diogocas').trim();
@@ -485,7 +487,13 @@ autoUpdater.on('update-available', info => sendUpdaterEvent('available', { statu
 autoUpdater.on('update-not-available', info => sendUpdaterEvent('not-available', { status: 'Sistema atualizado', ok: true, updateAvailable: false, latestVersion: String(info.version || pkg.version), checkedAt: new Date().toISOString(), info }));
 autoUpdater.on('download-progress', progress => sendUpdaterEvent('progress', { status: 'Baixando atualização...', ok: true, progress: Math.round(progress.percent || 0), bytesPerSecond: progress.bytesPerSecond, transferred: progress.transferred, total: progress.total }));
 autoUpdater.on('update-downloaded', info => sendUpdaterEvent('downloaded', { status: 'Atualização baixada. Instalando...', ok: true, downloaded: true, progress: 100, latestVersion: String(info.version || updaterState.latestVersion || pkg.version), info }));
-autoUpdater.on('error', error => sendUpdaterEvent('error', { status: 'Falha na atualização', ok: false, error: String(error && error.message || error) }));
+autoUpdater.on('error', error => {
+  const msg = String(error && error.message || error);
+  const hint = /401|403|404|not found|private|github/i.test(msg)
+    ? 'Se o repositório do GitHub for privado, o app instalado não consegue consultar Releases sem autenticação. Use um repositório público separado só para Releases ou um servidor próprio de atualização.'
+    : '';
+  sendUpdaterEvent('error', { status: 'Falha na atualização', ok: false, error: hint ? (msg + ' | ' + hint) : msg });
+});
 
 // Mantém os dados sempre em AppData/Roaming/nexagest, independente do nome da pasta/versão.
 app.setName('NexaGest');

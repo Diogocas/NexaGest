@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "9.1.0",
-  "description": "NexaGest 9.1.0 - Licenciamento Online e atualização automática profissional",
+  "version": "9.1.1",
+  "description": "NexaGest 9.1.1 - Limpeza da base e atualização automática ajustada",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -63,7 +63,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "9.1.0"
+      "version": "9.1.1"
     },
     "publish": [
       {
