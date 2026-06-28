@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "9.2.2",
-  "description": "NexaGest 9.2.2 - Atualizador PRO com modal integrado ao app",
+  "version": "9.3.1",
+  "description": "NexaGest 9.3.1 - Publicador PRO e Atualizador PRO integrado",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -14,7 +14,9 @@
     "comercial": "npm run dist:win",
     "check": "node --check src/main.js && node --check src/preload.js",
     "dist:portable": "electron-builder --win portable",
-    "build:installer": "npm install --foreground-scripts && npm run dist:win"
+    "build:installer": "npm install --foreground-scripts && npm run dist:win",
+    "publish:local": "PUBLICAR.bat",
+    "publish:pro": "PUBLICAR.bat"
   },
   "dependencies": {
     "qrcode": "^1.5.4",
@@ -63,7 +65,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "9.2.2"
+      "version": "9.3.0"
     },
     "publish": [
       {
