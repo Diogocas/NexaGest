@@ -99,7 +99,7 @@ function postJsonToUrl(url, payload = {}, timeoutMs = 15000) {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'User-Agent': 'NexaGest-License/9.2.0',
+          'User-Agent': 'NexaGest-License/9.2.2',
           'Content-Length': Buffer.byteLength(body)
         },
         timeout: timeoutMs
@@ -538,42 +538,31 @@ function askUserToDownloadUpdate(info = {}) {
   if (startupUpdatePromptShown || !mainWindow || mainWindow.isDestroyed()) return;
   startupUpdatePromptShown = true;
   const version = info.version || updaterState.latestVersion || 'nova';
-  const detail = 'Versão instalada: ' + pkg.version + '\nVersão disponível: ' + version + '\n\nO NexaGest pode baixar a atualização agora e instalar em seguida.';
-  dialog.showMessageBox(mainWindow, {
-    type: 'info',
-    title: 'Atualização disponível',
-    message: 'NexaGest ' + version + ' disponível',
-    detail,
-    buttons: ['Baixar agora', 'Depois'],
-    defaultId: 0,
-    cancelId: 1
-  }).then(result => {
-    if (result.response === 0) {
-      sendUpdaterEvent('download-started', { status: 'Iniciando download da atualização...', progress: 0, ok: true });
-      autoUpdater.downloadUpdate().catch(error => sendUpdaterEvent('error', {
-        status: 'Falha ao baixar atualização',
-        ok: false,
-        error: String(error && error.message || error)
-      }));
-    }
-  }).catch(() => {});
+  sendUpdaterEvent('prompt-download', {
+    ok: true,
+    status: 'Nova versão disponível',
+    updateAvailable: true,
+    latestVersion: String(version),
+    notes: info.releaseNotes || info.releaseName || updaterState.notes || '',
+    checkedAt: new Date().toISOString(),
+    info
+  });
 }
 
 function askUserToInstallUpdate(info = {}) {
   if (downloadedUpdatePromptShown || !mainWindow || mainWindow.isDestroyed()) return;
   downloadedUpdatePromptShown = true;
   const version = info.version || updaterState.latestVersion || 'nova';
-  dialog.showMessageBox(mainWindow, {
-    type: 'question',
-    title: 'Atualização pronta',
-    message: 'Atualização do NexaGest baixada',
-    detail: 'A versão ' + version + ' foi baixada. Deseja reiniciar agora para instalar?',
-    buttons: ['Reiniciar e instalar', 'Instalar ao sair'],
-    defaultId: 0,
-    cancelId: 1
-  }).then(result => {
-    if (result.response === 0) autoUpdater.quitAndInstall(false, true);
-  }).catch(() => {});
+  sendUpdaterEvent('prompt-install', {
+    ok: true,
+    status: 'Atualização baixada. Pronta para instalar.',
+    downloaded: true,
+    progress: 100,
+    latestVersion: String(version),
+    notes: info.releaseNotes || info.releaseName || updaterState.notes || '',
+    checkedAt: new Date().toISOString(),
+    info
+  });
 }
 
 autoUpdater.on('checking-for-update', () => sendUpdaterEvent('checking', { status: 'Verificando atualização...', ok: true, error: '' }));

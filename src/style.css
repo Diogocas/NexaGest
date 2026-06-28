@@ -1132,3 +1132,15 @@ input::placeholder,textarea::placeholder{transition:opacity .18s ease}input:focu
 .update-status-box.warn{border-color:rgba(245,158,11,.32);background:rgba(245,158,11,.10)}
 .update-status-box.bad{border-color:rgba(220,38,38,.32);background:rgba(220,38,38,.08)}
 .update-status-box.neutral{border-style:dashed}
+
+
+/* NexaGest 9.2.2 - Atualizador PRO */
+.updater-pro-overlay{backdrop-filter:blur(12px);background:rgba(2,6,23,.72)}
+.updater-pro-modal{max-width:760px;width:min(760px,calc(100vw - 36px));border:1px solid rgba(37,99,235,.45);box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 0 1px rgba(34,211,238,.08) inset;background:linear-gradient(145deg,rgba(15,23,42,.98),rgba(17,24,39,.96))}
+.updater-pro-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:6px 0 14px;border-bottom:1px solid rgba(148,163,184,.16)}
+.updater-pro-hero h2{margin:10px 0 6px;font-size:26px}.updater-pro-hero p{margin:0;color:var(--muted)}
+.updater-pro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}.updater-pro-grid>div{border:1px solid rgba(148,163,184,.18);background:rgba(30,41,59,.68);border-radius:16px;padding:14px}.updater-pro-grid span{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.updater-pro-grid b{font-size:18px}
+.updater-pro-progress{border:1px solid rgba(37,99,235,.28);background:rgba(15,23,42,.72);border-radius:18px;padding:16px;margin-bottom:16px}.updater-pro-progress .progress{height:10px;margin:12px 0 8px;background:rgba(148,163,184,.15);overflow:hidden}.updater-pro-progress .progress i{height:100%;display:block;background:linear-gradient(90deg,#2563eb,#22d3ee,#22c55e);border-radius:999px;box-shadow:0 0 18px rgba(34,211,238,.35);transition:width .25s ease}
+.updater-pro-notes{border:1px dashed rgba(148,163,184,.25);border-radius:18px;padding:15px;background:rgba(30,41,59,.38);margin-bottom:16px}.updater-pro-notes ul{margin:10px 0 0;padding-left:20px;color:var(--text)}.updater-pro-notes li{margin:6px 0;color:var(--muted)}
+.updater-pro-actions{display:flex;justify-content:flex-end;gap:12px}.updater-pro-actions button{min-width:170px}
+@media(max-width:720px){.updater-pro-grid{grid-template-columns:1fr}.updater-pro-actions{flex-direction:column}.updater-pro-actions button{width:100%}}
