@@ -1,4 +1,4 @@
-// NexaGest 8.3.0 - Comercialização, licença local e atualização preparada
+// NexaGest 9.1.0 - Licenciamento online/offline e atualização profissional
 (function(){
   const status = { none: 'Sem licença configurada', active: 'Licença ativa', invalid: 'Licença inválida', trial: 'Modo demonstração' };
   function normalizeKey(key){ return String(key||'').trim().toUpperCase(); }
@@ -11,7 +11,7 @@
     const clean=normalizeKey(key);
     if(!clean) return { ok:false, status:'none', label:status.none, message:'Informe uma licença ou use o modo demonstração.' };
     if(/^NEXA-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(clean)){
-      return { ok:true, status:'active', label:status.active, plan:'Profissional', offline:true, owner:String(owner||'').trim() };
+      return { ok:true, status:'active', label:status.active, plan:'Profissional', offline:true, onlineReady:true, owner:String(owner||'').trim(), message:'Licença local válida. Use Ativar online quando o servidor estiver configurado.' };
     }
     if(/^DEMO(-|$)/.test(clean)){
       return { ok:true, status:'trial', label:status.trial, plan:'Demonstração', offline:true, owner:String(owner||'').trim() };
@@ -25,12 +25,12 @@
   function licenseStatus(settings){ return validateLicense(settings?.licenseKey, settings?.licenseOwner).label; }
   window.NexaGestPremium = Object.freeze({
     name:'Premium/Licença',
-    version:'8.3.0',
+    version:'9.1.0',
     status,
     normalizeKey,
     validateLicense,
     generateDemoKey,
     licenseStatus,
-    commercialReady:true
+    commercialReady:true, onlineLicensingReady:true
   });
 })();

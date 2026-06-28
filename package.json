@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "9.0.3",
-  "description": "NexaGest 9.0.3 - Atualização Automática Profissional via electron-updater",
+  "version": "9.1.0",
+  "description": "NexaGest 9.1.0 - Licenciamento Online e atualização automática profissional",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -63,7 +63,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "9.0.3"
+      "version": "9.1.0"
     },
     "publish": [
       {

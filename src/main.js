@@ -5,6 +5,7 @@ const path = require('path');
 const database = require('./database');
 const http = require('http');
 const os = require('os');
+const crypto = require('crypto');
 const pkg = require('../package.json');
 
 let mainWindow = null;
@@ -75,6 +76,70 @@ function touchClient(req) {
 function activeClientCount() {
   const limit = Date.now() - 1000 * 60 * 5;
   return Object.values(networkServerState.clients || {}).filter(c => Date.parse(c.lastSeenAt || '') >= limit).length;
+}
+
+
+function getMachineId() {
+  try {
+    const raw = [os.hostname(), os.userInfo().username, os.platform(), os.arch()].join('|');
+    return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 32);
+  } catch (_) {
+    return crypto.createHash('sha256').update(os.hostname() || 'nexagest').digest('hex').slice(0, 32);
+  }
+}
+
+function postJsonToUrl(url, payload = {}, timeoutMs = 15000) {
+  return new Promise((resolve, reject) => {
+    try {
+      const parsed = new URL(String(url || ''));
+      const lib = parsed.protocol === 'https:' ? require('https') : require('http');
+      const body = JSON.stringify(payload || {});
+      const req = lib.request(parsed, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'NexaGest-License/9.1.0',
+          'Content-Length': Buffer.byteLength(body)
+        },
+        timeout: timeoutMs
+      }, res => {
+        let data = '';
+        res.setEncoding('utf8');
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          if (res.statusCode < 200 || res.statusCode >= 300) {
+            reject(new Error('Servidor de licença retornou HTTP ' + res.statusCode));
+            return;
+          }
+          try { resolve(data ? JSON.parse(data) : { ok: true }); }
+          catch (error) { reject(new Error('Resposta de licença inválida: ' + error.message)); }
+        });
+      });
+      req.on('timeout', () => req.destroy(new Error('Tempo esgotado no servidor de licença.')));
+      req.on('error', reject);
+      req.write(body);
+      req.end();
+    } catch (error) { reject(error); }
+  });
+}
+
+function normalizeLicenseResponse(response = {}, fallback = {}) {
+  const ok = response.ok === true || response.active === true || response.status === 'active' || response.status === 'trial';
+  return {
+    ok,
+    online: true,
+    status: response.status || (ok ? 'active' : 'invalid'),
+    label: response.label || (ok ? 'Licença online ativa' : 'Licença online inválida'),
+    plan: response.plan || fallback.plan || 'Profissional',
+    owner: response.owner || fallback.owner || '',
+    email: response.email || fallback.email || '',
+    expiresAt: response.expiresAt || response.expires_at || '',
+    message: response.message || response.notes || '',
+    token: response.token || fallback.token || '',
+    checkedAt: new Date().toISOString(),
+    deviceId: fallback.deviceId || getMachineId()
+  };
 }
 
 function networkStatusPayload(extra = {}) {
@@ -388,8 +453,8 @@ function configureAutoUpdater(payload = {}) {
   autoUpdater.allowPrerelease = false;
   autoUpdater.logger = console;
 
-  const owner = String(payload.githubOwner || payload.owner || '').trim();
-  const repo = String(payload.githubRepo || payload.repo || '').trim();
+  const owner = String(payload.githubOwner || payload.owner || 'Diogocas').trim();
+  const repo = String(payload.githubRepo || payload.repo || 'NexaGest').trim();
   if (owner && repo) {
     autoUpdater.setFeedURL({ provider: 'github', owner, repo, releaseType: 'release' });
   }
@@ -1032,6 +1097,56 @@ function downloadFile(url, destination) {
   });
 }
 
+
+ipcMain.handle('license-device-info', async () => ({ ok: true, deviceId: getMachineId(), hostname: os.hostname(), platform: os.platform(), arch: os.arch(), appVersion: pkg.version }));
+
+ipcMain.handle('license-online-activate', async (_event, payload = {}) => {
+  try {
+    const endpoint = String(payload.licenseServerUrl || payload.endpoint || '').trim();
+    if (!endpoint) return { ok: false, online: false, error: 'Informe a URL do servidor de licenças para ativação online.' };
+    const deviceId = getMachineId();
+    const body = {
+      app: 'NexaGest',
+      version: pkg.version,
+      action: 'activate',
+      licenseKey: payload.licenseKey || '',
+      owner: payload.licenseOwner || payload.owner || '',
+      email: payload.licenseEmail || payload.email || '',
+      plan: payload.licensePlan || payload.plan || '',
+      deviceId,
+      hostname: os.hostname(),
+      platform: os.platform(),
+      arch: os.arch()
+    };
+    const response = await postJsonToUrl(endpoint.replace(/\/+$/, '') + '/activate', body);
+    return normalizeLicenseResponse(response, { ...body, deviceId });
+  } catch (error) {
+    return { ok: false, online: false, status: 'offline', label: 'Servidor de licença indisponível', error: String(error && error.message || error), checkedAt: new Date().toISOString(), deviceId: getMachineId() };
+  }
+});
+
+ipcMain.handle('license-online-validate', async (_event, payload = {}) => {
+  try {
+    const endpoint = String(payload.licenseServerUrl || payload.endpoint || '').trim();
+    if (!endpoint) return { ok: false, online: false, error: 'URL do servidor de licenças não configurada.' };
+    const deviceId = getMachineId();
+    const body = {
+      app: 'NexaGest',
+      version: pkg.version,
+      action: 'validate',
+      licenseKey: payload.licenseKey || '',
+      token: payload.licenseToken || payload.token || '',
+      email: payload.licenseEmail || payload.email || '',
+      deviceId,
+      hostname: os.hostname()
+    };
+    const response = await postJsonToUrl(endpoint.replace(/\/+$/, '') + '/validate', body);
+    return normalizeLicenseResponse(response, { ...body, deviceId });
+  } catch (error) {
+    return { ok: false, online: false, status: 'offline', label: 'Validação online indisponível', error: String(error && error.message || error), checkedAt: new Date().toISOString(), deviceId: getMachineId() };
+  }
+});
+
 ipcMain.handle('commercial-check-update', async (_event, payload = {}) => {
   try {
     configureAutoUpdater(payload || {});
@@ -1044,7 +1159,7 @@ ipcMain.handle('commercial-check-update', async (_event, payload = {}) => {
         latestVersion: pkg.version,
         version: pkg.version,
         updateAvailable: false,
-        status: 'Modo desenvolvimento: gere/instale o Setup para testar atualização real.',
+        status: 'Modo desenvolvimento: gere/instale o Setup para testar atualização real. Se a Release tiver a mesma versão instalada, nenhuma atualização aparece.',
         notes: 'O electron-updater verifica atualizações apenas no aplicativo empacotado.',
         checkedAt: new Date().toISOString()
       };

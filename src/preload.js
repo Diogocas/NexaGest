@@ -29,6 +29,9 @@ contextBridge.exposeInMainWorld('nexagest', {
   commercialDownloadUpdate: (manifest) => ipcRenderer.invoke('commercial-download-update', manifest),
   commercialInstallUpdate: () => ipcRenderer.invoke('commercial-install-update'),
   commercialUpdateStatus: () => ipcRenderer.invoke('commercial-update-status'),
+  licenseDeviceInfo: () => ipcRenderer.invoke('license-device-info'),
+  licenseOnlineActivate: (payload) => ipcRenderer.invoke('license-online-activate', payload),
+  licenseOnlineValidate: (payload) => ipcRenderer.invoke('license-online-validate', payload),
   onUpdaterEvent: (callback) => {
     const listener = (_event, payload) => { if (typeof callback === 'function') callback(payload); };
     ipcRenderer.on('nexagest-updater-event', listener);
