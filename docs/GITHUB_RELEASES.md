@@ -1,55 +1,27 @@
-# NexaGest 9.0.2 — Servidor de versões via GitHub Releases
+# NexaGest — GitHub Releases
 
-Esta versão prepara o NexaGest para usar o GitHub Releases como servidor de versões.
+A partir da versão 9.0.3, o NexaGest usa o `electron-updater` com o arquivo `latest.yml` gerado automaticamente pelo `electron-builder`.
 
-## Arquivos da release
+## Arquivos da Release
 
-Em cada release do GitHub, envie estes assets:
+Em cada Release do GitHub, envie:
 
 - `NexaGest-Setup.exe`
-- `latest.json`
-- opcional: `NexaGest-Portable.exe`
+- `latest.yml`
+- `NexaGest-Setup.exe.blockmap`
 
-## URL recomendada do manifesto
+Não envie a pasta `dist/` para o repositório.
 
-No NexaGest, em Configurações/Comercialização, use:
+## Tag recomendada
 
-```txt
-https://github.com/USUARIO/REPOSITORIO/releases/latest/download/latest.json
-```
-
-Também é possível informar apenas o usuário/org e o repositório. Nesse caso o app usa a API:
+Use tags no padrão:
 
 ```txt
-https://api.github.com/repos/USUARIO/REPOSITORIO/releases/latest
+v9.0.3
+v9.0.4
+v9.1.0
 ```
 
-## Exemplo de latest.json
+## Observação importante
 
-```json
-{
-  "version": "9.0.2",
-  "latestVersion": "9.0.2",
-  "channel": "stable",
-  "provider": "github-releases",
-  "notes": "Resumo das novidades da versão.",
-  "installer": "NexaGest-Setup.exe",
-  "downloadUrl": "https://github.com/USUARIO/REPOSITORIO/releases/download/v9.0.2/NexaGest-Setup.exe",
-  "releaseUrl": "https://github.com/USUARIO/REPOSITORIO/releases/tag/v9.0.2",
-  "publishedAt": "2026-06-28T00:00:00.000Z"
-}
-```
-
-## Como publicar uma nova versão
-
-1. Atualize a versão no `package.json` e no app.
-2. Rode `npm install --foreground-scripts`.
-3. Rode `npm run dist:win`.
-4. Crie uma release no GitHub com tag, por exemplo `v9.0.2`.
-5. Envie `dist/NexaGest-Setup.exe` como asset.
-6. Envie um `latest.json` apontando para o instalador.
-7. No NexaGest, clique em **Verificar atualização agora**.
-
-## Observação
-
-O GitHub pode redirecionar downloads. A versão 9.0.2 já trata redirecionamentos tanto no manifesto quanto no download.
+Para clientes finais, os arquivos da Release precisam estar acessíveis sem token privado. Se o repositório for privado, o cliente não conseguirá baixar a atualização diretamente pelo GitHub sem autenticação.

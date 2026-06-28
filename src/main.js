@@ -1,9 +1,24 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, shell } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const fs = require('fs');
 const path = require('path');
 const database = require('./database');
 const http = require('http');
 const os = require('os');
+const pkg = require('../package.json');
+
+let mainWindow = null;
+let updaterState = {
+  ok: true,
+  status: 'Pronto',
+  currentVersion: pkg.version,
+  latestVersion: pkg.version,
+  updateAvailable: false,
+  progress: 0,
+  checkedAt: null,
+  downloaded: false,
+  error: ''
+};
 
 let networkServer = null;
 let networkServerState = {
@@ -357,6 +372,56 @@ async function requestJson(base, action, payload) {
   });
 }
 
+
+function sendUpdaterEvent(channel, payload = {}) {
+  updaterState = { ...updaterState, ...payload, currentVersion: pkg.version };
+  try {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('nexagest-updater-event', { channel, ...updaterState });
+    }
+  } catch (_) {}
+}
+
+function configureAutoUpdater(payload = {}) {
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.allowPrerelease = false;
+  autoUpdater.logger = console;
+
+  const owner = String(payload.githubOwner || payload.owner || '').trim();
+  const repo = String(payload.githubRepo || payload.repo || '').trim();
+  if (owner && repo) {
+    autoUpdater.setFeedURL({ provider: 'github', owner, repo, releaseType: 'release' });
+  }
+}
+
+function normalizeUpdaterInfo(info = {}) {
+  const latestVersion = String(info.version || updaterState.latestVersion || pkg.version);
+  return {
+    ok: true,
+    source: 'electron-updater',
+    app: 'NexaGest',
+    currentVersion: pkg.version,
+    latestVersion,
+    version: latestVersion,
+    updateAvailable: compareVersions(latestVersion, pkg.version) > 0,
+    notes: info.releaseNotes || info.releaseName || '',
+    releaseUrl: '',
+    installer: 'NexaGest-Setup.exe',
+    checkedAt: new Date().toISOString(),
+    downloaded: !!updaterState.downloaded,
+    progress: updaterState.progress || 0,
+    status: updaterState.status || 'Pronto'
+  };
+}
+
+autoUpdater.on('checking-for-update', () => sendUpdaterEvent('checking', { status: 'Verificando atualização...', ok: true, error: '' }));
+autoUpdater.on('update-available', info => sendUpdaterEvent('available', { status: 'Nova versão disponível', ok: true, updateAvailable: true, latestVersion: String(info.version || ''), checkedAt: new Date().toISOString(), info }));
+autoUpdater.on('update-not-available', info => sendUpdaterEvent('not-available', { status: 'Sistema atualizado', ok: true, updateAvailable: false, latestVersion: String(info.version || pkg.version), checkedAt: new Date().toISOString(), info }));
+autoUpdater.on('download-progress', progress => sendUpdaterEvent('progress', { status: 'Baixando atualização...', ok: true, progress: Math.round(progress.percent || 0), bytesPerSecond: progress.bytesPerSecond, transferred: progress.transferred, total: progress.total }));
+autoUpdater.on('update-downloaded', info => sendUpdaterEvent('downloaded', { status: 'Atualização baixada. Instalando...', ok: true, downloaded: true, progress: 100, latestVersion: String(info.version || updaterState.latestVersion || pkg.version), info }));
+autoUpdater.on('error', error => sendUpdaterEvent('error', { status: 'Falha na atualização', ok: false, error: String(error && error.message || error) }));
+
 // Mantém os dados sempre em AppData/Roaming/nexagest, independente do nome da pasta/versão.
 app.setName('NexaGest');
 app.setPath('userData', path.join(app.getPath('appData'), 'nexagest')); // preserva dados das versões anteriores
@@ -407,6 +472,8 @@ function createWindow() {
       devTools: true
     }
   });
+
+  mainWindow = win;
 
   win.webContents.on('before-input-event', (event, input) => {
     if ((input.control || input.meta) && input.shift && input.key.toUpperCase() === 'I') {
@@ -965,68 +1032,73 @@ function downloadFile(url, destination) {
   });
 }
 
-ipcMain.handle('commercial-check-update', async (_event, payload={}) => {
-  const manifestUrl = typeof payload === 'string' ? payload : (payload && payload.manifestUrl);
-  const githubOwner = payload && (payload.githubOwner || payload.owner);
-  const githubRepo = payload && (payload.githubRepo || payload.repo);
-  const repoInput = payload && (payload.githubRepoUrl || payload.repository || payload.repoUrl);
-  const parsedRepo = parseGitHubRepoInput(repoInput || manifestUrl);
-  const githubApiUrl = buildGitHubLatestApiUrl(githubOwner || parsedRepo?.owner, githubRepo || parsedRepo?.repo);
-
-  if (manifestUrl && /^https?:\/\//i.test(String(manifestUrl))) {
-    try {
-      const online = await getJsonFromUrl(manifestUrl);
-      if (Array.isArray(online.assets) && (online.tag_name || online.html_url)) {
-        return normalizeGitHubRelease(online, 'github-api');
-      }
-      return normalizeUpdateManifest({ ...online, manifestUrl }, online.provider === 'github-releases' ? 'github-manifest' : 'online');
-    } catch (manifestError) {
-      if (githubApiUrl && !/api\.github\.com\/repos\//i.test(String(manifestUrl))) {
-        try {
-          const release = await getJsonFromUrl(githubApiUrl);
-          return normalizeGitHubRelease(release, 'github-api');
-        } catch (githubError) {
-          const local = readLocalUpdateManifest();
-          return { ...local, ok:false, source:'github-api', fallback:local, error:String(githubError && githubError.message || githubError), manifestError:String(manifestError && manifestError.message || manifestError), checkedAt:new Date().toISOString() };
-        }
-      }
-      const local = readLocalUpdateManifest();
-      return { ...local, ok:false, source:'online', fallback:local, error:String(manifestError && manifestError.message || manifestError), checkedAt:new Date().toISOString() };
+ipcMain.handle('commercial-check-update', async (_event, payload = {}) => {
+  try {
+    configureAutoUpdater(payload || {});
+    if (!app.isPackaged) {
+      const dev = {
+        ok: true,
+        source: 'electron-updater-dev',
+        app: 'NexaGest',
+        currentVersion: pkg.version,
+        latestVersion: pkg.version,
+        version: pkg.version,
+        updateAvailable: false,
+        status: 'Modo desenvolvimento: gere/instale o Setup para testar atualização real.',
+        notes: 'O electron-updater verifica atualizações apenas no aplicativo empacotado.',
+        checkedAt: new Date().toISOString()
+      };
+      updaterState = { ...updaterState, ...dev };
+      return dev;
     }
+    const result = await autoUpdater.checkForUpdates();
+    const info = result && result.updateInfo ? result.updateInfo : {};
+    const normalized = normalizeUpdaterInfo(info);
+    updaterState = { ...updaterState, ...normalized };
+    return normalized;
+  } catch (error) {
+    const result = { ok: false, source: 'electron-updater', currentVersion: pkg.version, latestVersion: pkg.version, updateAvailable: false, status: 'Falha ao verificar atualização', error: String(error && error.message || error), checkedAt: new Date().toISOString() };
+    updaterState = { ...updaterState, ...result };
+    return result;
   }
-
-  if (githubApiUrl) {
-    try {
-      const release = await getJsonFromUrl(githubApiUrl);
-      return normalizeGitHubRelease(release, 'github-api');
-    } catch (error) {
-      const local = readLocalUpdateManifest();
-      return { ...local, ok:false, source:'github-api', fallback:local, error:String(error && error.message || error), checkedAt:new Date().toISOString() };
-    }
-  }
-
-  return readLocalUpdateManifest();
 });
 
-ipcMain.handle('commercial-download-update' , async (_event, manifest={}) => {
+ipcMain.handle('commercial-download-update', async (_event, payload = {}) => {
   try {
-    const url = manifest.downloadUrl || manifest.installerUrl || '';
-    if (!url || !/^https?:\/\//i.test(String(url))) {
-      if (manifest.releaseUrl) {
-        await shell.openExternal(manifest.releaseUrl);
-        return { ok:true, openedRelease:true, message:'Página da atualização aberta no navegador.' };
-      }
-      return { ok:false, error:'Manifesto sem downloadUrl. Configure o link do NexaGest-Setup.exe.' };
+    configureAutoUpdater(payload || {});
+    if (!app.isPackaged) {
+      return { ok: false, source: 'electron-updater-dev', error: 'A instalação automática só funciona no aplicativo instalado pelo Setup.' };
     }
-    const fileName = manifest.installer || 'NexaGest-Setup.exe';
-    const destination = path.join(app.getPath('downloads'), fileName);
-    const result = await downloadFile(url, destination);
-    await shell.openPath(destination);
-    return { ...result, opened:true };
+    if (!updaterState.updateAvailable && payload.updateAvailable !== true) {
+      const checked = await autoUpdater.checkForUpdates();
+      const info = checked && checked.updateInfo ? checked.updateInfo : {};
+      updaterState = { ...updaterState, ...normalizeUpdaterInfo(info) };
+    }
+    if (!updaterState.updateAvailable && payload.updateAvailable !== true) {
+      return { ok: false, source: 'electron-updater', error: 'Nenhuma atualização disponível.' };
+    }
+    sendUpdaterEvent('download-started', { status: 'Iniciando download da atualização...', progress: 0, ok: true });
+    await autoUpdater.downloadUpdate();
+    setTimeout(() => {
+      try { autoUpdater.quitAndInstall(false, true); } catch (_) {}
+    }, 1200);
+    return { ok: true, source: 'electron-updater', status: 'Atualização baixada. Reiniciando para instalar...', installing: true };
+  } catch (error) {
+    return { ok: false, source: 'electron-updater', error: String(error && error.message || error) };
+  }
+});
+
+ipcMain.handle('commercial-install-update', async () => {
+  try {
+    if (!app.isPackaged) return { ok:false, error:'Instalação automática disponível apenas no app instalado.' };
+    autoUpdater.quitAndInstall(false, true);
+    return { ok:true };
   } catch (error) {
     return { ok:false, error:String(error && error.message || error) };
   }
 });
+
+ipcMain.handle('commercial-update-status', async () => ({ ...updaterState, currentVersion: pkg.version }));
 
 ipcMain.handle('commercial-open-docs', async () => {
   const doc = path.join(process.cwd(), 'docs', 'PRIMEIRO_USO.md');

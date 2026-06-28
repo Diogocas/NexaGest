@@ -27,6 +27,13 @@ contextBridge.exposeInMainWorld('nexagest', {
   generateQrCode: (text) => ipcRenderer.invoke('generate-qr-code', text),
   commercialCheckUpdate: (payload) => ipcRenderer.invoke('commercial-check-update', payload),
   commercialDownloadUpdate: (manifest) => ipcRenderer.invoke('commercial-download-update', manifest),
+  commercialInstallUpdate: () => ipcRenderer.invoke('commercial-install-update'),
+  commercialUpdateStatus: () => ipcRenderer.invoke('commercial-update-status'),
+  onUpdaterEvent: (callback) => {
+    const listener = (_event, payload) => { if (typeof callback === 'function') callback(payload); };
+    ipcRenderer.on('nexagest-updater-event', listener);
+    return () => ipcRenderer.removeListener('nexagest-updater-event', listener);
+  },
   commercialOpenDocs: () => ipcRenderer.invoke('commercial-open-docs'),
   commercialOpenDownloads: () => ipcRenderer.invoke('commercial-open-downloads')
 });

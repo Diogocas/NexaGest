@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "9.0.2",
-  "description": "NexaGest 9.0.2 - Servidor de Versões via GitHub Releases",
+  "version": "9.0.3",
+  "description": "NexaGest 9.0.3 - Atualização Automática Profissional via electron-updater",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "qrcode": "^1.5.4",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "electron-updater": "^6.6.2"
   },
   "devDependencies": {
     "electron": "42.5.0",
@@ -62,7 +63,15 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "9.0.2"
-    }
+      "version": "9.0.3"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Diogocas",
+        "repo": "NexaGest",
+        "releaseType": "release"
+      }
+    ]
   }
 }
