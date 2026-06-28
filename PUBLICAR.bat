@@ -48,8 +48,8 @@ if not exist "%REPO%\.git" (
   exit /b 1
 )
 
-set /p VERSION=Versao para publicar (ex.: 9.3.1): 
-if "%VERSION%"=="" set "VERSION=9.3.1"
+set /p VERSION=Versao para publicar (ex.: 9.3.2): 
+if "%VERSION%"=="" set "VERSION=9.3.2"
 
 set /p MSG=Mensagem do commit (Enter para padrao): 
 if "%MSG%"=="" set "MSG=NexaGest %VERSION%"
