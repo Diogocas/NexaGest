@@ -1,0 +1,68 @@
+{
+  "name": "nexagest",
+  "version": "9.0.2",
+  "description": "NexaGest 9.0.2 - Servidor de Versões via GitHub Releases",
+  "main": "src/main.js",
+  "author": "LivePlay",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win nsis",
+    "comercial": "npm run dist:win",
+    "check": "node --check src/main.js && node --check src/preload.js",
+    "dist:portable": "electron-builder --win portable",
+    "build:installer": "npm install --foreground-scripts && npm run dist:win"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "electron": "42.5.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "br.com.nexagest.app",
+    "productName": "NexaGest",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "docs/**/*",
+      "updates/**/*",
+      "build/**/*",
+      "GERAR-INSTALADOR.bat"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "NexaGest",
+      "artifactName": "NexaGest-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "NexaGest-Portable.${ext}"
+    },
+    "copyright": "Copyright © NexaGest",
+    "extraMetadata": {
+      "name": "nexagest",
+      "productName": "NexaGest",
+      "version": "9.0.2"
+    }
+  }
+}

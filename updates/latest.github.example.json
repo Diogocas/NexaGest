@@ -1,0 +1,17 @@
+{
+  "version": "9.0.2",
+  "latestVersion": "9.0.2",
+  "channel": "stable",
+  "provider": "github-releases",
+  "notes": "Servidor de versões via GitHub Releases: suporte a latest.json publicado como asset e leitura da API de releases/latest.",
+  "installer": "NexaGest-Setup.exe",
+  "portable": "NexaGest-Portable.exe",
+  "downloadUrl": "",
+  "releaseUrl": "",
+  "github": {
+    "owner": "SEU_USUARIO_OU_ORG",
+    "repo": "NexaGest",
+    "tag": "v9.0.2"
+  },
+  "publishedAt": "2026-06-28T00:00:00.000Z"
+}
