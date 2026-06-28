@@ -99,7 +99,7 @@ function postJsonToUrl(url, payload = {}, timeoutMs = 15000) {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'User-Agent': 'NexaGest-License/9.1.0',
+          'User-Agent': 'NexaGest-License/9.2.0',
           'Content-Length': Buffer.byteLength(body)
         },
         timeout: timeoutMs
@@ -451,8 +451,6 @@ function configureAutoUpdater(payload = {}) {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.allowPrerelease = false;
-  autoUpdater.allowDowngrade = false;
-  autoUpdater.fullChangelog = true;
   autoUpdater.logger = console;
 
   const owner = String(payload.githubOwner || payload.owner || 'Diogocas').trim();
@@ -482,18 +480,108 @@ function normalizeUpdaterInfo(info = {}) {
   };
 }
 
+
+let startupUpdatePromptShown = false;
+let downloadedUpdatePromptShown = false;
+let startupUpdateCheckDone = false;
+
+function updaterRepoConfigFromPackage() {
+  try {
+    const publish = Array.isArray(pkg.build?.publish) ? pkg.build.publish[0] : pkg.build?.publish;
+    return {
+      owner: publish?.owner || 'Diogocas',
+      repo: publish?.repo || 'NexaGest'
+    };
+  } catch (_) {
+    return { owner: 'Diogocas', repo: 'NexaGest' };
+  }
+}
+
+function runStartupUpdateCheck() {
+  if (startupUpdateCheckDone) return;
+  startupUpdateCheckDone = true;
+  if (!app.isPackaged) {
+    sendUpdaterEvent('dev-skip', {
+      ok: true,
+      status: 'Atualização automática ativa apenas no app instalado.',
+      checkedAt: new Date().toISOString()
+    });
+    return;
+  }
+  try {
+    const cfg = updaterRepoConfigFromPackage();
+    configureAutoUpdater(cfg);
+    sendUpdaterEvent('startup-check', {
+      ok: true,
+      status: 'Verificando atualização automaticamente...',
+      checkedAt: new Date().toISOString()
+    });
+    autoUpdater.checkForUpdates().catch(error => {
+      sendUpdaterEvent('startup-error', {
+        ok: false,
+        status: 'Não foi possível verificar atualização automática.',
+        error: String(error && error.message || error),
+        checkedAt: new Date().toISOString()
+      });
+    });
+  } catch (error) {
+    sendUpdaterEvent('startup-error', {
+      ok: false,
+      status: 'Falha ao preparar atualização automática.',
+      error: String(error && error.message || error),
+      checkedAt: new Date().toISOString()
+    });
+  }
+}
+
+function askUserToDownloadUpdate(info = {}) {
+  if (startupUpdatePromptShown || !mainWindow || mainWindow.isDestroyed()) return;
+  startupUpdatePromptShown = true;
+  const version = info.version || updaterState.latestVersion || 'nova';
+  const detail = 'Versão instalada: ' + pkg.version + '\nVersão disponível: ' + version + '\n\nO NexaGest pode baixar a atualização agora e instalar em seguida.';
+  dialog.showMessageBox(mainWindow, {
+    type: 'info',
+    title: 'Atualização disponível',
+    message: 'NexaGest ' + version + ' disponível',
+    detail,
+    buttons: ['Baixar agora', 'Depois'],
+    defaultId: 0,
+    cancelId: 1
+  }).then(result => {
+    if (result.response === 0) {
+      sendUpdaterEvent('download-started', { status: 'Iniciando download da atualização...', progress: 0, ok: true });
+      autoUpdater.downloadUpdate().catch(error => sendUpdaterEvent('error', {
+        status: 'Falha ao baixar atualização',
+        ok: false,
+        error: String(error && error.message || error)
+      }));
+    }
+  }).catch(() => {});
+}
+
+function askUserToInstallUpdate(info = {}) {
+  if (downloadedUpdatePromptShown || !mainWindow || mainWindow.isDestroyed()) return;
+  downloadedUpdatePromptShown = true;
+  const version = info.version || updaterState.latestVersion || 'nova';
+  dialog.showMessageBox(mainWindow, {
+    type: 'question',
+    title: 'Atualização pronta',
+    message: 'Atualização do NexaGest baixada',
+    detail: 'A versão ' + version + ' foi baixada. Deseja reiniciar agora para instalar?',
+    buttons: ['Reiniciar e instalar', 'Instalar ao sair'],
+    defaultId: 0,
+    cancelId: 1
+  }).then(result => {
+    if (result.response === 0) autoUpdater.quitAndInstall(false, true);
+  }).catch(() => {});
+}
+
 autoUpdater.on('checking-for-update', () => sendUpdaterEvent('checking', { status: 'Verificando atualização...', ok: true, error: '' }));
-autoUpdater.on('update-available', info => sendUpdaterEvent('available', { status: 'Nova versão disponível', ok: true, updateAvailable: true, latestVersion: String(info.version || ''), checkedAt: new Date().toISOString(), info }));
+autoUpdater.on('update-available', info => { sendUpdaterEvent('available', { status: 'Nova versão disponível', ok: true, updateAvailable: true, latestVersion: String(info.version || ''), checkedAt: new Date().toISOString(), info }); askUserToDownloadUpdate(info); });
 autoUpdater.on('update-not-available', info => sendUpdaterEvent('not-available', { status: 'Sistema atualizado', ok: true, updateAvailable: false, latestVersion: String(info.version || pkg.version), checkedAt: new Date().toISOString(), info }));
 autoUpdater.on('download-progress', progress => sendUpdaterEvent('progress', { status: 'Baixando atualização...', ok: true, progress: Math.round(progress.percent || 0), bytesPerSecond: progress.bytesPerSecond, transferred: progress.transferred, total: progress.total }));
-autoUpdater.on('update-downloaded', info => sendUpdaterEvent('downloaded', { status: 'Atualização baixada. Instalando...', ok: true, downloaded: true, progress: 100, latestVersion: String(info.version || updaterState.latestVersion || pkg.version), info }));
-autoUpdater.on('error', error => {
-  const msg = String(error && error.message || error);
-  const hint = /401|403|404|not found|private|github/i.test(msg)
-    ? 'Se o repositório do GitHub for privado, o app instalado não consegue consultar Releases sem autenticação. Use um repositório público separado só para Releases ou um servidor próprio de atualização.'
-    : '';
-  sendUpdaterEvent('error', { status: 'Falha na atualização', ok: false, error: hint ? (msg + ' | ' + hint) : msg });
-});
+autoUpdater.on('update-downloaded', info => { sendUpdaterEvent('downloaded', { status: 'Atualização baixada. Pronta para instalar.', ok: true, downloaded: true, progress: 100, latestVersion: String(info.version || updaterState.latestVersion || pkg.version), info }); askUserToInstallUpdate(info); });
+autoUpdater.on('error', error => sendUpdaterEvent('error', { status: 'Falha na atualização', ok: false, error: String(error && error.message || error) }));
 
 // Mantém os dados sempre em AppData/Roaming/nexagest, independente do nome da pasta/versão.
 app.setName('NexaGest');
@@ -563,6 +651,7 @@ function createWindow() {
     setTimeout(() => {
       if (!win.isDestroyed()) win.show();
       if (splash && !splash.isDestroyed()) splash.close();
+      setTimeout(runStartupUpdateCheck, 2500);
     }, 900);
   });
 
