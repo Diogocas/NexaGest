@@ -170,6 +170,21 @@ function save(opts={}){
       .catch(err=>{console.warn('SQLite save falhou',err);updateSaveStatus('error')});
   },120);
 }
+async function saveNow(opts={}){
+  if(!window.nexagest?.saveDatabase)return {ok:false,error:'Banco indisponível'};
+  const silent=opts.silent!==false;
+  clearTimeout(saveTimer);
+  updateSaveStatus('saving',{silent});
+  try{
+    const res=await window.nexagest.saveDatabase(db);
+    updateSaveStatus('saved',{silent});
+    return res||{ok:true};
+  }catch(err){
+    console.warn('SQLite save falhou',err);
+    updateSaveStatus('error');
+    return {ok:false,error:String(err?.message||err)};
+  }
+}
 function saveWithFeedback(){save({silent:false})}
 function audit(action){db.audit.unshift({id:uid(),date:new Date().toISOString(),user:db.session?.name||'Sistema',action});save()}
 function accessLog(action,extra=''){db.accessLogs=db.accessLogs||[];db.accessLogs.unshift({id:uid(),date:new Date().toISOString(),user:db.session?.name||'Sistema',role:db.session?.role||'',action,extra});db.accessLogs=db.accessLogs.slice(0,500);save()}
@@ -1235,7 +1250,22 @@ function openFirstUseWizard(){
 function closeFirstUseWizard(){document.getElementById('firstUseWizard')?.remove()}
 
 function openFirstUseWizard(){alert('Assistente: confira empresa, WhatsApp, backup, usuários e teste de impressão. A central já está organizada por etapas.');localStorage.setItem('settings-smart-tab','diagnostico');app()}
-function saveCompany(){if(!requireCan('settings'))return;['company','document','phone','city','address','monthlyGoal','whatsappMsg'].forEach(k=>{let el=document.getElementById(k);if(el)db.settings[k]=el.value});audit('Empresa alterada');save();saveCurrentCompanyRegistry();app()}function saveSystem(){if(!requireCan('settings'))return;let theme=document.getElementById('theme'),accent=document.getElementById('accent'),server=document.getElementById('serverAddress'),network=document.getElementById('networkMode');if(theme)db.settings.theme=theme.value;if(accent)db.settings.accent=accent.value;if(server)db.settings.serverAddress=server.value;if(network)db.settings.networkMode=network.checked;save();app()}
+async function saveCompany(){
+  if(!requireCan('settings'))return;
+  const fields=['company','document','phone','city','address','monthlyGoal','whatsappMsg'];
+  db.settings={...(db.settings||{})};
+  fields.forEach(k=>{
+    const el=document.getElementById(k);
+    if(!el)return;
+    db.settings[k]=k==='monthlyGoal' ? Number(el.value||0) : el.value;
+  });
+  audit('Empresa alterada');
+  const res=await saveNow({silent:false});
+  await saveCurrentCompanyRegistry();
+  app();
+  if(res?.ok===false)alert('Não foi possível salvar os dados da empresa: '+(res.error||'erro desconhecido'));
+  else alert('Dados da empresa salvos com sucesso.');
+}function saveSystem(){if(!requireCan('settings'))return;let theme=document.getElementById('theme'),accent=document.getElementById('accent'),server=document.getElementById('serverAddress'),network=document.getElementById('networkMode');if(theme)db.settings.theme=theme.value;if(accent)db.settings.accent=accent.value;if(server)db.settings.serverAddress=server.value;if(network)db.settings.networkMode=network.checked;save();app()}
 function readLogo(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{db.settings.logo=r.result;save();app()};r.readAsDataURL(f)}
 async function backup(){if(!requireCan('settings'))return;await withOperation('Gerando backup...',async()=>{let res=await window.nexagest.saveBackup(db);if(res.ok)alert('Backup salvo com sucesso.')})}async function restore(){if(!requireCan('settings'))return;let res=await withOperation('Lendo backup...',()=>window.nexagest.loadBackup());if(res.ok){confirmAction('Restaurar backup?',()=>{db=migrate(res.data);save();app();alert('Backup restaurado com sucesso.')},'Restaurar backup','Restaurar')}}
 
