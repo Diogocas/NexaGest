@@ -1,3 +1,7 @@
+# NexaGest 1.0.0
+
+Primeira versão comercial do NexaGest.
+
 # NexaGest 13.1.1 — Trial automático e bloqueio de licença
 
 ## Principais ajustes
