@@ -1,4 +1,4 @@
-// NexaGest 6.9.1 - Clientes PRO
+// Clientes
 // Melhoria segura da aba Clientes: indicadores, busca sem recarregar, perfil rápido,
 // contato por WhatsApp e visão de crédito/fiado sem alterar banco, Electron ou dependências.
 (function(){

@@ -44,7 +44,7 @@
 
       <div class="grid two stock-pro-top">
         <div class="panel stock-action-panel">
-          <div class="between"><h3>Movimentar estoque</h3><span class="pill good">PRO</span></div>
+          <div class="between"><h3>Movimentar estoque</h3></div>
           <div class="form-grid">
             <div class="field"><label>Produto</label><select id="moveProduct">${products.map(p=>`<option value="${p.id}">${esc(p.name)} — atual: ${n(p.stock)}</option>`).join('')}</select></div>
             <div class="field"><label>Tipo</label><select id="moveType">${movementTypes().map(x=>`<option>${x}</option>`).join('')}</select></div>

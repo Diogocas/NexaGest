@@ -1,4 +1,4 @@
-// NexaGest 6.9.2 - Financeiro PRO
+// Financeiro
 // Camada segura de apoio ao módulo financeiro.
 (function(){
   const FINANCE_CATEGORIES = ['Fornecedor','Combustível','Embalagem','Energia','Internet','Aluguel','Mercadoria','Taxas','Comissão','Salário','Impostos','Outros'];

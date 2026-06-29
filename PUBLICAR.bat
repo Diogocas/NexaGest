@@ -4,7 +4,7 @@ chcp 65001 >nul
 
 cls
 echo ==================================================
-echo              NEXAGEST - PUBLICADOR PRO
+echo              NEXAGEST - PUBLICADOR
 echo ==================================================
 echo.
 echo Este script publica SOMENTE o codigo no GitHub.
@@ -48,8 +48,8 @@ if not exist "%REPO%\.git" (
   exit /b 1
 )
 
-set /p VERSION=Versao para publicar (ex.: 10.5.0): 
-if "%VERSION%"=="" set "VERSION=10.5.0"
+set /p VERSION=Versao para publicar (ex.: 11.5.7): 
+if "%VERSION%"=="" set "VERSION=11.5.7"
 
 set /p MSG=Mensagem do commit (Enter para padrao): 
 if "%MSG%"=="" set "MSG=NexaGest %VERSION%"

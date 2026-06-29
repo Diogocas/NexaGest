@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "10.5.0",
-  "description": "NexaGest 10.5 - BI PRO com painel executivo, Curva ABC, heatmap de vendas, comparativos e indicadores gerenciais",
+  "version": "11.5.7",
+  "description": "NexaGest 11.5.7 - limpeza final de interface e nomes comerciais",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -65,7 +65,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "10.5.0"
+      "version": "11.5.7"
     },
     "publish": [
       {
@@ -75,6 +75,6 @@
         "releaseType": "release"
       }
     ],
-    "buildVersion": "10.5.0"
+    "buildVersion": "11.5.7"
   }
 }

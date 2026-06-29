@@ -38,5 +38,6 @@ contextBridge.exposeInMainWorld('nexagest', {
     return () => ipcRenderer.removeListener('nexagest-updater-event', listener);
   },
   commercialOpenDocs: () => ipcRenderer.invoke('commercial-open-docs'),
-  commercialOpenDownloads: () => ipcRenderer.invoke('commercial-open-downloads')
+  commercialOpenDownloads: () => ipcRenderer.invoke('commercial-open-downloads'),
+  aiProviderRequest: (payload) => ipcRenderer.invoke('ai-provider-request', payload)
 });

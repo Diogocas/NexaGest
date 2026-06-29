@@ -99,7 +99,7 @@ function postJsonToUrl(url, payload = {}, timeoutMs = 15000) {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'User-Agent': 'NexaGest-License/9.3.2',
+          'User-Agent': 'NexaGest-License/11.5.6',
           'Content-Length': Buffer.byteLength(body)
         },
         timeout: timeoutMs
@@ -1315,6 +1315,70 @@ ipcMain.handle('commercial-open-downloads', async () => {
   await shell.openPath(dir);
   return { ok:true, path:dir };
 });
+
+
+
+function postJsonRaw(url, headers = {}, payload = {}, timeoutMs = 45000) {
+  return new Promise((resolve, reject) => {
+    try {
+      const parsed = new URL(String(url || ''));
+      const lib = parsed.protocol === 'https:' ? require('https') : require('http');
+      const body = JSON.stringify(payload || {});
+      const req = lib.request(parsed, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Content-Length': Buffer.byteLength(body), ...headers },
+        timeout: timeoutMs
+      }, res => {
+        let data = '';
+        res.setEncoding('utf8');
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          let parsedBody = null;
+          try { parsedBody = data ? JSON.parse(data) : {}; } catch (_) { parsedBody = { raw: data }; }
+          if (res.statusCode < 200 || res.statusCode >= 300) {
+            reject(new Error((parsedBody && (parsedBody.error?.message || parsedBody.message || parsedBody.error)) || ('HTTP ' + res.statusCode)));
+            return;
+          }
+          resolve(parsedBody);
+        });
+      });
+      req.on('timeout', () => req.destroy(new Error('Tempo esgotado ao consultar o provedor de IA.')));
+      req.on('error', reject);
+      req.write(body);
+      req.end();
+    } catch (error) { reject(error); }
+  });
+}
+
+async function aiProviderRequest(payload = {}) {
+  const provider = String(payload.provider || 'local').toLowerCase();
+  const messages = Array.isArray(payload.messages) ? payload.messages : [];
+  const model = payload.model || (provider === 'ollama' ? 'llama3.1' : 'gpt-4o-mini');
+  if (provider === 'local') return { ok: false, provider, fallback: true, message: 'Modo local selecionado.' };
+  if (provider === 'openai') {
+    const apiKey = String(payload.apiKey || '').trim();
+    if (!apiKey) return { ok: false, provider, fallback: true, message: 'Informe a chave da OpenAI nas configurações da IA.' };
+    const endpoint = String(payload.endpoint || 'https://api.openai.com/v1/chat/completions').trim() || 'https://api.openai.com/v1/chat/completions';
+    const result = await postJsonRaw(endpoint, { Authorization: `Bearer ${apiKey}` }, { model, messages, temperature: Number(payload.temperature ?? 0.3), max_tokens: Number(payload.maxTokens || 900) });
+    return { ok: true, provider, model, text: result.choices?.[0]?.message?.content || result.output_text || '', raw: result };
+  }
+  if (provider === 'ollama') {
+    const base = String(payload.baseUrl || 'http://127.0.0.1:11434').replace(/\/+$/, '');
+    const result = await postJsonRaw(base + '/api/chat', {}, { model, messages, stream: false, options: { temperature: Number(payload.temperature ?? 0.2) } }, Number(payload.timeoutMs || 90000));
+    return { ok: true, provider, model, text: result.message?.content || result.response || '', raw: result };
+  }
+  if (provider === 'custom') {
+    const endpoint = String(payload.endpoint || '').trim();
+    if (!endpoint) return { ok: false, provider, fallback: true, message: 'Informe o endpoint do provedor personalizado.' };
+    const headers = {};
+    if (payload.apiKey) headers.Authorization = `Bearer ${payload.apiKey}`;
+    const result = await postJsonRaw(endpoint, headers, { model, messages, prompt: messages.map(m => `${m.role}: ${m.content}`).join('\n') }, Number(payload.timeoutMs || 60000));
+    return { ok: true, provider, model, text: result.text || result.response || result.message?.content || result.choices?.[0]?.message?.content || JSON.stringify(result).slice(0, 2000), raw: result };
+  }
+  return { ok: false, provider, fallback: true, message: 'Provedor de IA não reconhecido.' };
+}
+
+ipcMain.handle('ai-provider-request', async (_event, payload = {}) => aiProviderRequest(payload));
 
 ipcMain.handle('get-app-info', async () => {
   const pkg = require('../package.json');
