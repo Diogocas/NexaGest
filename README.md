@@ -1,4 +1,4 @@
-# NexaGest 13.1.0 — Trial automático e bloqueio de licença
+# NexaGest 13.1.1 — Trial automático e bloqueio de licença
 
 ## Principais ajustes
 
@@ -9,7 +9,7 @@
 - Quando vencer, o sistema bloqueia imediatamente e mantém apenas a ativação de licença disponível.
 - Os dados cadastrados não são apagados.
 - Licença por período ou permanente libera o sistema novamente.
-- `PUBLICAR.bat`, `package.json` e `src/config.js` atualizados para `13.1.0`.
+- `PUBLICAR.bat`, `package.json` e `src/config.js` atualizados para `13.1.1`.
 
 ## Arquivo DEV
 

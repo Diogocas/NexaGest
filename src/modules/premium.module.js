@@ -1,4 +1,4 @@
-// NexaGest 13.1.0 - Licenciamento offline por período ou permanente
+// NexaGest 13.2.4 - Licenciamento com cliente/e-mail automáticos
 (function(){
   const status = {
     none: 'Sem licença configurada',
@@ -9,7 +9,7 @@
     expired: 'Licença expirada'
   };
   const SECRET = 'NEXAGEST-LIC-OFFLINE-13';
-  function normalizeKey(key){ return String(key||'').trim().toUpperCase(); }
+  function normalizeKey(key){ return String(key||'').replace(/\s+/g,'').trim(); }
   function simpleChecksum(text){
     let h=2166136261;
     for(const ch of String(text||'')){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619); }
@@ -23,8 +23,8 @@
     }catch(e){ return ''; }
   }
   function parseSignedLicense(clean){
-    const raw=String(clean||'').trim();
-    const m=raw.match(/^NEXA-([A-Z0-9_-]+)\.([A-Z0-9]{8})$/i);
+    const raw=normalizeKey(clean);
+    const m=raw.match(/^NEXA-([A-Za-z0-9_-]+)\.([A-Za-z0-9]{8})$/);
     if(!m)return null;
     const json=b64urlDecode(m[1]);
     if(!json)return null;
@@ -43,11 +43,40 @@
     d.setDate(d.getDate()+Math.max(1,Number(days||1)));
     return ymd(d);
   }
-  function daysLeft(expiresAt){
+  function expirationDate(expiresAt){
     if(!expiresAt)return null;
-    const exp=new Date(String(expiresAt)+'T23:59:59');
-    if(isNaN(exp))return null;
+    const raw=String(expiresAt);
+    const exp=raw.includes('T')?new Date(raw):new Date(raw+'T23:59:59');
+    return isNaN(exp)?null:exp;
+  }
+  function daysLeft(expiresAt){
+    const exp=expirationDate(expiresAt);
+    if(!exp)return null;
     return Math.ceil((exp-new Date())/86400000);
+  }
+  function minutesLeft(expiresAt){
+    const exp=expirationDate(expiresAt);
+    if(!exp)return null;
+    return Math.ceil((exp-new Date())/60000);
+  }
+
+  function friendlyRemaining(expiresAt){
+    const exp=expirationDate(expiresAt);
+    if(!exp)return '—';
+    const ms=exp-new Date();
+    if(ms<=0)return 'Licença expirada';
+    const totalSeconds=Math.floor(ms/1000);
+    const totalMinutes=Math.floor(totalSeconds/60);
+    const totalHours=Math.floor(totalMinutes/60);
+    const days=Math.floor(totalHours/24);
+    const hours=totalHours%24;
+    const minutes=totalMinutes%60;
+    const seconds=totalSeconds%60;
+    if(days>=2)return hours>0?`Restam ${days} dias e ${hours}h`:`Restam ${days} dias`;
+    if(days===1)return hours>0?`Resta 1 dia e ${hours}h`:'Resta 1 dia';
+    if(totalHours>=1)return minutes>0?`Restam ${totalHours}h ${minutes}min`:`Restam ${totalHours}h`;
+    if(totalMinutes>=1)return seconds>0?`Restam ${totalMinutes}min ${seconds}s`:`Restam ${totalMinutes}min`;
+    return `Restam ${Math.max(0,seconds)}s`;
   }
   function validateLicense(key, owner, settings){
     const clean=normalizeKey(key);
@@ -56,20 +85,23 @@
     if(signed){
       if(signed.invalid)return { ok:false, validLicense:false, status:'invalid', label:status.invalid, message:signed.message };
       const type=(signed.type==='period'||signed.type==='periodo'||signed.type==='demo')?'period':'permanent';
-      const durationDays=Math.max(1,Number(signed.days||signed.durationDays||signed.periodDays||30));
-      const base={ validLicense:true, type, durationDays, owner:signed.owner||owner||'', email:signed.email||'', id:signed.id||'', issuedAt:signed.issuedAt||'', offline:true };
+      const durationMinutes=signed.minutes||signed.durationMinutes?Math.max(1,Number(signed.minutes||signed.durationMinutes)):0;
+      const durationDays=durationMinutes?0:Math.max(1,Number(signed.days||signed.durationDays||signed.periodDays||30));
+      const base={ validLicense:true, type, durationDays, durationMinutes, owner:signed.owner||owner||'', email:signed.email||'', id:signed.id||'', issuedAt:signed.issuedAt||'', offline:true };
       if(type==='period'){
         const activatedKey=normalizeKey(settings?.licenseActivationKey||'');
         const activatedAt=settings?.licenseActivatedAt||'';
         const expiresAt=settings?.licenseExpiresAt||'';
         if(activatedKey!==clean || !activatedAt || !expiresAt){
-          return { ...base, ok:true, status:'pending', label:status.pending, needsActivation:true, message:`Licença por período pronta para ativar. A contagem de ${durationDays} dia(s) começa na primeira ativação.` };
+          return { ...base, ok:true, status:'pending', label:status.pending, needsActivation:true, message:durationMinutes?`Licença de teste rápido pronta para ativar. A contagem de ${durationMinutes} minuto(s) começa na primeira ativação.`:`Licença por período pronta para ativar. A contagem de ${durationDays} dia(s) começa na primeira ativação.` };
         }
         const left=daysLeft(expiresAt);
-        if(Number.isFinite(left) && left<0){
-          return { ...base, ok:false, status:'expired', label:status.expired, activatedAt, expiresAt, daysLeft:left, message:'A licença expirou. Entre em contato para renovar ou inserir uma nova licença.' };
+        const minLeft=minutesLeft(expiresAt);
+        if(Number.isFinite(minLeft) && minLeft<0){
+          return { ...base, ok:false, status:'expired', label:status.expired, activatedAt, expiresAt, daysLeft:left, minutesLeft:minLeft, message:'A licença expirou. Entre em contato para renovar ou inserir uma nova licença.' };
         }
-        return { ...base, ok:true, status:'period', label:status.period, activatedAt, expiresAt, daysLeft:left, message:`Licença por período ativa. Restam ${left} dia(s).` };
+        const msg=`Licença por período ativa. ${friendlyRemaining(expiresAt)}.`;
+        return { ...base, ok:true, status:'period', label:status.period, activatedAt, expiresAt, daysLeft:left, minutesLeft:minLeft, message:msg, remainingLabel:friendlyRemaining(expiresAt) };
       }
       return { ...base, ok:true, status:'active', label:status.active, activatedAt:settings?.licenseActivatedAt||'', expiresAt:'', message:'Licença permanente offline válida.' };
     }
@@ -78,7 +110,7 @@
   function licenseStatus(settings){ return validateLicense(settings?.licenseKey, settings?.licenseOwner, settings).label; }
   window.NexaGestPremium = Object.freeze({
     name:'Licença',
-    version:'13.1.0',
+    version:'13.2.4',
     status,
     normalizeKey,
     parseSignedLicense,

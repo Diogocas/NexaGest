@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NexaGest License Manager DEV</title>
 <style>
-:root{font-family:Inter,Segoe UI,Arial,sans-serif;background:#0b1220;color:#e8eefc}body{margin:0;padding:32px;background:radial-gradient(circle at top,#13233f,#070b14 60%)}.wrap{max-width:980px;margin:auto}.card{background:#101827;border:1px solid #263757;border-radius:20px;padding:24px;box-shadow:0 24px 60px #0008}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:20px}.pill{background:#123b2d;color:#20e28a;border:1px solid #1c8f61;border-radius:999px;padding:8px 12px;font-weight:800}h1{margin:0 0 8px;font-size:30px}.muted{color:#9fb0ca}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{display:flex;flex-direction:column;gap:8px}.wide{grid-column:1/-1}label{font-weight:800;color:#b9c8e2}input,select,textarea{background:#172238;color:#fff;border:1px solid #31425f;border-radius:12px;padding:13px;font-size:15px}textarea{min-height:140px;font-family:Consolas,monospace}button{border:0;border-radius:12px;background:#2563eb;color:#fff;padding:14px 18px;font-weight:900;cursor:pointer}button.secondary{background:#172238;border:1px solid #31425f}.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}.out{margin-top:20px}.ok{color:#20e28a}.warn{color:#fbbf24}.small{font-size:13px}.box{background:#0b1220;border:1px dashed #3b82f6;border-radius:14px;padding:16px;margin-top:14px}.hidden{display:none}</style>
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;background:#0b1220;color:#e8eefc;--card:#101827;--line:#263757;--muted:#9fb0ca;--blue:#2563eb;--green:#20e28a;--yellow:#fbbf24;--red:#fb7185}*{box-sizing:border-box}body{margin:0;padding:32px;background:radial-gradient(circle at top,#13233f,#070b14 60%)}.wrap{max-width:1180px;margin:auto}.card{background:linear-gradient(180deg,#101827,#0c1322);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 24px 60px #0008;margin-bottom:18px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:20px}.pill{background:#123b2d;color:var(--green);border:1px solid #1c8f61;border-radius:999px;padding:8px 12px;font-weight:800;white-space:nowrap}.pill.warn{background:#3b2f13;color:var(--yellow);border-color:#8a6a16}.pill.danger{background:#3b1420;color:#ff9aae;border-color:#8a2742}h1{margin:0 0 8px;font-size:30px}h2{margin:0 0 12px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{display:flex;flex-direction:column;gap:8px}.wide{grid-column:1/-1}label{font-weight:800;color:#b9c8e2}input,select,textarea{background:#172238;color:#fff;border:1px solid #31425f;border-radius:12px;padding:13px;font-size:15px}textarea{min-height:120px;font-family:Consolas,monospace}button{border:0;border-radius:12px;background:var(--blue);color:#fff;padding:12px 15px;font-weight:900;cursor:pointer}button.secondary{background:#172238;border:1px solid #31425f}button.good{background:#15803d}button.warn{background:#b45309}button.danger{background:#be123c}button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.box{background:#0b1220;border:1px dashed #3b82f6;border-radius:14px;padding:16px;margin-top:14px}.small{font-size:13px}.history-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.toolbar input{min-width:260px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.stat{background:#0b1220;border:1px solid var(--line);border-radius:14px;padding:14px}.stat b{display:block;font-size:22px;margin-top:4px}.history table{width:100%;border-collapse:collapse;background:#0b1220;border:1px solid var(--line);border-radius:14px;overflow:hidden}.history th,.history td{border-bottom:1px solid var(--line);padding:10px;text-align:left;font-size:13px;vertical-align:top}.history th{color:#b9c8e2;background:#111b2e}.history code{font-size:11px;color:#93c5fd;word-break:break-all}.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{padding:8px 9px;border-radius:9px;font-size:12px}.empty{padding:18px;border:1px dashed #334766;border-radius:14px;background:#0b1220}.tag{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:800}.tag.period{background:#1f2937;color:#bfdbfe;border:1px solid #334766}.tag.permanent{background:#123b2d;color:#86efac;border:1px solid #1c8f61}@media(max-width:800px){.grid,.stats{grid-template-columns:1fr}.hero{flex-direction:column}.toolbar input{min-width:100%}}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -13,9 +14,9 @@
     <div class="hero">
       <div>
         <h1>🔐 NexaGest License Manager DEV</h1>
-        <p class="muted">Ferramenta offline para gerar licenças por período ou permanentes. Use somente no seu computador de desenvolvimento.</p>
+        <p class="muted">Ferramenta offline para gerar e gerenciar licenças. Cliente e e-mail ficam embutidos na chave e aparecem automaticamente no NexaGest.</p>
       </div>
-      <span class="pill">DEV 13.1.0</span>
+      <span class="pill">DEV 13.2.5</span>
     </div>
     <div class="grid">
       <div class="field"><label>Cliente / Responsável</label><input id="owner" placeholder="Ex.: Mercado Silva"></div>
@@ -23,6 +24,7 @@
       <div class="field"><label>Tipo</label><select id="type" onchange="toggleDays()"><option value="period" selected>Por período</option><option value="permanent">Permanente</option></select></div>
       <div class="field" id="daysField"><label>Dias da licença</label><select id="days"><option>7</option><option>15</option><option selected>30</option><option>90</option><option>180</option><option>365</option></select></div>
       <div class="field"><label>Dias personalizados</label><input id="customDays" type="number" min="1" placeholder="opcional"></div>
+      <div class="field"><label>Teste rápido (minutos)</label><input id="customMinutes" type="number" min="1" placeholder="opcional para testes"></div>
       <div class="field"><label>ID interno/opcional</label><input id="id" placeholder="automático"></div>
       <div class="field wide"><label>Licença gerada</label><textarea id="license" readonly placeholder="Clique em Gerar licença"></textarea></div>
     </div>
@@ -32,30 +34,108 @@
       <button class="secondary" onclick="clearForm()">Limpar</button>
     </div>
     <div class="box small muted">
-      <b>Como usar:</b> gere a licença aqui, copie a chave e envie ao cliente. No NexaGest instalado, o cliente cola a licença e clica em <b>Ativar licença</b>. Licenças por período começam a contar somente na primeira ativação do cliente, não na data em que você gerou a chave.
+      <b>Como usar:</b> gere a licença aqui, copie a chave e envie ao cliente. No NexaGest instalado, o cliente cola a licença e clica em <b>Ativar licença</b>. Licenças por período começam a contar somente na primeira ativação do cliente. Para renovar, gere uma nova chave para o mesmo cliente e envie ao cliente.
     </div>
+  </div>
+
+  <div class="card history">
+    <div class="history-head">
+      <div>
+        <h2>📋 Gerenciar licenças</h2>
+        <p class="muted small">Histórico salvo somente neste navegador/computador DEV.</p>
+      </div>
+      <div class="toolbar">
+        <input id="search" placeholder="Buscar por cliente, e-mail ou licença" oninput="renderHistory()">
+        <button class="secondary" onclick="exportJson()">Exportar JSON</button>
+        <button class="secondary" onclick="exportCsv()">Exportar CSV</button>
+        <button class="secondary" onclick="document.getElementById('importFile').click()">Importar</button>
+        <button class="danger" onclick="clearHistory()">Limpar histórico</button>
+        <input id="importFile" type="file" accept=".json,application/json" style="display:none" onchange="importJson(event)">
+      </div>
+    </div>
+    <div class="stats" id="statsBox"></div>
+    <div id="historyBox"></div>
   </div>
 </div>
 <script>
 const SECRET='NEXAGEST-LIC-OFFLINE-13';
+const STORAGE_KEY='nexagest-license-history';
 function checksum(text){let h=2166136261;for(const ch of String(text||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0).toString(36).toUpperCase().slice(0,8).padStart(8,'0')}
 function b64url(text){return btoa(unescape(encodeURIComponent(text))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function ymd(d){return d.toISOString().slice(0,10)}
-function toggleDays(){const period=document.getElementById('type').value==='period';document.getElementById('daysField').style.opacity=period?'1':'.45';document.getElementById('days').disabled=!period;document.getElementById('customDays').disabled=!period}
+function nowBR(){return new Date().toLocaleString('pt-BR')}
+function toggleDays(){const period=document.getElementById('type').value==='period';document.getElementById('daysField').style.opacity=period?'1':'.45';document.getElementById('days').disabled=!period;document.getElementById('customDays').disabled=!period;document.getElementById('customMinutes').disabled=!period}
 function getDays(){const custom=Number(document.getElementById('customDays').value||0);return Math.max(1,custom||Number(document.getElementById('days').value||30))}
-function generate(){
-  const owner=document.getElementById('owner').value.trim()||'Cliente NexaGest';
-  const email=document.getElementById('email').value.trim();
-  const type=document.getElementById('type').value;
-  const payload={id:document.getElementById('id').value.trim()||('LIC-'+Date.now().toString(36).toUpperCase()),owner,email,type,issuedAt:ymd(new Date())};
-  if(type==='period')payload.durationDays=getDays();
-  const json=JSON.stringify(payload);
-  const key='NEXA-'+b64url(json)+'.'+checksum(json+SECRET);
-  document.getElementById('license').value=key;
+function getMinutes(){return Math.max(0,Number(document.getElementById('customMinutes').value||0))}
+function ensureRecordIds(list){let changed=false;const out=(Array.isArray(list)?list:[]).map((x,i)=>{if(!x.recordId){x={...x,recordId:'HIS-'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,7).toUpperCase()+i};changed=true}return x});if(changed)localStorage.setItem(STORAGE_KEY,JSON.stringify(out.slice(0,1000)));return out}
+function licenseHistory(){try{return ensureRecordIds(JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'))}catch{return []}}
+function setHistory(list){localStorage.setItem(STORAGE_KEY,JSON.stringify(list.slice(0,1000)));renderHistory()}
+function makePayload({owner,email,type='period',days=30,minutes=0,id=''}){
+  const payload={id:id||('LIC-'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,6).toUpperCase()),owner,email,type,issuedAt:ymd(new Date())};
+  if(type==='period'){if(minutes){payload.durationMinutes=Number(minutes)}else{payload.durationDays=Number(days||30)}}
+  return payload;
 }
-async function copyKey(){const v=document.getElementById('license').value;if(!v)return alert('Gere a licença primeiro.');try{await navigator.clipboard.writeText(v);alert('Licença copiada.')}catch(e){document.getElementById('license').select();document.execCommand('copy');alert('Licença copiada.')}}
-function clearForm(){['owner','email','id','license','customDays'].forEach(id=>document.getElementById(id).value='');document.getElementById('days').value=30;document.getElementById('type').value='period';toggleDays()}
-toggleDays();
+function buildKey(payload){const json=JSON.stringify(payload);return 'NEXA-'+b64url(json)+'.'+checksum(json+SECRET)}
+function validityText(payload){if(payload.type==='permanent')return 'Permanente';if(payload.durationMinutes)return payload.durationMinutes+' minuto(s) após ativar';return (payload.durationDays||30)+' dia(s) após ativar'}
+function saveLicenseHistory(item){const list=licenseHistory();list.unshift(item);setHistory(list)}
+function generateFromPayload(payload, origin='manual'){
+  const key=buildKey(payload);
+  const item={
+    recordId:'HIS-'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,7).toUpperCase(),
+    createdAt:nowBR(),
+    updatedAt:nowBR(),
+    origin,
+    owner:payload.owner||'',
+    email:payload.email||'',
+    type:payload.type,
+    typeLabel:payload.type==='period'?'Por período':'Permanente',
+    durationDays:payload.durationDays||0,
+    durationMinutes:payload.durationMinutes||0,
+    validity:validityText(payload),
+    key,
+    payload
+  };
+  saveLicenseHistory(item);
+  document.getElementById('license').value=key;
+  return item;
+}
+function generate(){
+  const owner=document.getElementById('owner').value.trim();
+  const email=document.getElementById('email').value.trim();
+  if(!owner)return alert('Informe o nome do cliente/responsável para manter o controle das licenças.');
+  if(!email)return alert('Informe o e-mail do cliente para manter o controle das licenças.');
+  const type=document.getElementById('type').value;
+  const payload=makePayload({owner,email,type,days:getDays(),minutes:getMinutes(),id:document.getElementById('id').value.trim()});
+  generateFromPayload(payload,'Nova licença');
+  copyKey(false);
+  alert('Licença gerada, salva no histórico e copiada.');
+}
+async function copyText(text, showAlert=true){if(!text)return alert('Nada para copiar.');try{await navigator.clipboard.writeText(text);if(showAlert)alert('Copiado.')}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();if(showAlert)alert('Copiado.')}}
+function copyKey(showAlert=true){copyText(document.getElementById('license').value,showAlert)}
+function clearForm(){['owner','email','id','license','customDays','customMinutes'].forEach(id=>document.getElementById(id).value='');document.getElementById('days').value=30;document.getElementById('type').value='period';toggleDays()}
+function filteredHistory(){const q=(document.getElementById('search')?.value||'').toLowerCase().trim();const list=licenseHistory();if(!q)return list;return list.filter(x=>[x.owner,x.email,x.key,x.typeLabel,x.validity].some(v=>String(v||'').toLowerCase().includes(q)))}
+function renderStats(list){const total=list.length;const period=list.filter(x=>x.type==='period').length;const permanent=list.filter(x=>x.type==='permanent').length;const quick=list.filter(x=>Number(x.durationMinutes||0)>0).length;document.getElementById('statsBox').innerHTML=`<div class="stat"><span class="muted small">Total</span><b>${total}</b></div><div class="stat"><span class="muted small">Por período</span><b>${period}</b></div><div class="stat"><span class="muted small">Permanentes</span><b>${permanent}</b></div><div class="stat"><span class="muted small">Testes rápidos</span><b>${quick}</b></div>`}
+function renderHistory(){
+  const box=document.getElementById('historyBox');if(!box)return;
+  const list=filteredHistory();renderStats(licenseHistory());
+  if(!list.length){box.innerHTML='<div class="empty muted">Nenhuma licença encontrada.</div>';return;}
+  box.innerHTML='<table><thead><tr><th>Data</th><th>Cliente</th><th>E-mail</th><th>Tipo</th><th>Validade</th><th>Licença</th><th>Ações</th></tr></thead><tbody>'+list.slice(0,200).map(x=>`<tr><td>${x.createdAt||''}</td><td><b>${escapeHtml(x.owner||'')}</b><br><span class="muted small">${escapeHtml(x.origin||'')}</span></td><td>${escapeHtml(x.email||'')}</td><td><span class="tag ${x.type==='permanent'?'permanent':'period'}">${x.type==='permanent'?'♾️':'⏳'} ${escapeHtml(x.typeLabel||'')}</span></td><td>${escapeHtml(x.validity||'')}</td><td><code>${escapeHtml(String(x.key||'').slice(0,42))}...</code></td><td><div class="actions"><button class="secondary" data-action="copy" data-id="${escapeHtml(x.recordId)}">Copiar</button><button class="good" data-action="renew" data-id="${escapeHtml(x.recordId)}">Renovar</button><button class="warn" data-action="addDays" data-id="${escapeHtml(x.recordId)}">Adicionar dias</button><button class="secondary" data-action="permanent" data-id="${escapeHtml(x.recordId)}">Permanente</button><button class="secondary" data-action="edit" data-id="${escapeHtml(x.recordId)}">Editar base</button><button class="danger" data-action="delete" data-id="${escapeHtml(x.recordId)}">Excluir</button></div></td></tr>`).join('')+'</tbody></table>';
+}
+function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function findRecord(id){return licenseHistory().find(x=>x.recordId===id)}
+function copyHistory(id){const rec=findRecord(id);if(!rec)return alert('Não encontrei esta licença no histórico. Atualize a página e tente novamente.');copyText(rec.key)}
+function renew(id){const rec=findRecord(id);if(!rec)return;let d=prompt('Renovar por quantos dias?\nEx.: 30, 90, 365', rec.durationDays||30);if(d===null)return;d=Math.max(1,Number(d||30));const payload=makePayload({owner:rec.owner,email:rec.email,type:'period',days:d});generateFromPayload(payload,'Renovação de '+(rec.owner||rec.email||'cliente'));copyText(buildKey(payload),false);alert('Nova licença de renovação gerada e copiada. Envie essa nova chave para o cliente.');}
+function addDays(id){const rec=findRecord(id);if(!rec)return;let d=prompt('Gerar nova licença adicionando quantos dias?\nComo o sistema é offline, será criada uma nova chave para o cliente ativar.', rec.durationDays||30);if(d===null)return;d=Math.max(1,Number(d||30));const base=Number(rec.durationDays||0);const total=base?base+d:d;const payload=makePayload({owner:rec.owner,email:rec.email,type:'period',days:total});generateFromPayload(payload,'Adição de dias para '+(rec.owner||rec.email||'cliente'));copyText(buildKey(payload),false);alert('Nova licença gerada com '+total+' dia(s) e copiada. Envie essa nova chave para o cliente.');}
+function makePermanent(id){const rec=findRecord(id);if(!rec)return;if(!confirm('Gerar uma nova licença permanente para '+(rec.owner||rec.email||'este cliente')+'?'))return;const payload=makePayload({owner:rec.owner,email:rec.email,type:'permanent'});generateFromPayload(payload,'Conversão para permanente');copyText(buildKey(payload),false);alert('Licença permanente gerada e copiada.');}
+function loadToForm(id){const rec=findRecord(id);if(!rec)return;document.getElementById('owner').value=rec.owner||'';document.getElementById('email').value=rec.email||'';document.getElementById('type').value=rec.type||'period';document.getElementById('customDays').value=rec.durationDays||'';document.getElementById('customMinutes').value=rec.durationMinutes||'';document.getElementById('license').value=rec.key||'';toggleDays();window.scrollTo({top:0,behavior:'smooth'});}
+function deleteRecord(id){const rec=findRecord(id);if(!rec)return;if(!confirm('Excluir esta licença apenas do histórico local?\nA chave enviada ao cliente não será cancelada, pois o licenciamento é offline.'))return;setHistory(licenseHistory().filter(x=>x.recordId!==id));}
+function clearHistory(){if(!confirm('Limpar todo o histórico local de licenças?\nIsso não afeta clientes que já ativaram licenças.'))return;localStorage.removeItem(STORAGE_KEY);renderHistory()}
+function download(name,content,type='application/json'){const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();URL.revokeObjectURL(a.href);a.remove()}
+function exportJson(){download('nexagest-licencas-historico.json',JSON.stringify(licenseHistory(),null,2))}
+function exportCsv(){const rows=[['Data','Cliente','Email','Tipo','Validade','Origem','Licenca']].concat(licenseHistory().map(x=>[x.createdAt,x.owner,x.email,x.typeLabel,x.validity,x.origin,x.key]));const csv=rows.map(r=>r.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(';')).join('\n');download('nexagest-licencas-historico.csv',csv,'text/csv;charset=utf-8')}
+function importJson(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{const imported=JSON.parse(reader.result);if(!Array.isArray(imported))throw new Error('Arquivo inválido');const current=licenseHistory();const map=new Map();ensureRecordIds([...imported,...current]).forEach(x=>map.set(x.recordId,x));setHistory([...map.values()]);alert('Histórico importado.')}catch(e){alert('Não consegui importar: '+e.message)}ev.target.value=''};reader.readAsText(f)}
+document.addEventListener('click',function(ev){const btn=ev.target.closest('button[data-action][data-id]');if(!btn)return;const id=btn.dataset.id;const action=btn.dataset.action;if(action==='copy')return copyHistory(id);if(action==='renew')return renew(id);if(action==='addDays')return addDays(id);if(action==='permanent')return makePermanent(id);if(action==='edit')return loadToForm(id);if(action==='delete')return deleteRecord(id);});
+toggleDays();renderHistory();
 </script>
 </body>
 </html>

@@ -99,7 +99,7 @@ function postJsonToUrl(url, payload = {}, timeoutMs = 15000) {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'User-Agent': 'NexaGest-License/13.1.0',
+          'User-Agent': 'NexaGest-License/13.2.4',
           'Content-Length': Buffer.byteLength(body)
         },
         timeout: timeoutMs

@@ -1,4 +1,4 @@
-// NexaGest 13.1.0 - Trial automático e bloqueio de licença
+// NexaGest 13.2.4 - Ativação por licença com dados automáticos
 const AUXILIARY_MODULES_READY = !!(window.NexaGestNfe && window.NexaGestBackup && window.NexaGestSettings && window.NexaGestIntegrations && window.NexaGestPremium);
 function enhanceVisualExperience(){
   document.body.classList.add('view-ready');
@@ -27,6 +27,14 @@ function updateLiveClock(){
   const current=formatTopbarDateTime();
   document.querySelectorAll('[data-live-date]').forEach(el=>{el.textContent=current.date});
   document.querySelectorAll('[data-live-time]').forEach(el=>{el.textContent=current.time});
+  document.querySelectorAll('[data-license-global-warning]').forEach(el=>{
+    const data=licenseGlobalWarningData();
+    if(!data){ el.className='license-global-warning hidden'; el.textContent=''; el.title=''; return; }
+    el.className='license-global-warning '+data.level;
+    el.textContent=data.text;
+    el.title=data.title||data.text;
+  });
+  refreshLicenseCountdownLabels();
 }
 let liveClockTimer=null;
 function ensureLiveClock(){
@@ -36,7 +44,9 @@ function ensureLiveClock(){
 }
 function liveDateTimeHtml(extraClass=''){
   const current=formatTopbarDateTime();
-  return `<span class="live-clock premium-clock ${extraClass}" aria-label="Data e hora atual"><span class="clock-chip date-chip"><span class="clock-icon">📅</span><span data-live-date>${current.date}</span></span><span class="clock-divider"></span><span class="clock-chip time-chip"><span class="clock-pulse"></span><span class="clock-icon">🕒</span><strong data-live-time>${current.time}</strong></span></span>`;
+  const warning=licenseGlobalWarningData();
+  const warningHtml=warning?`<span class="license-global-warning ${warning.level}" data-license-global-warning title="${esc(warning.title||warning.text)}">${esc(warning.text)}</span>`:`<span class="license-global-warning hidden" data-license-global-warning></span>`;
+  return `<span class="live-clock premium-clock ${extraClass}" aria-label="Data, hora atual e status de licença"><span class="clock-chip date-chip"><span class="clock-icon">📅</span><span data-live-date>${current.date}</span></span><span class="clock-divider"></span><span class="clock-chip time-chip"><span class="clock-pulse"></span><span class="clock-icon">🕒</span><strong data-live-time>${current.time}</strong></span>${warningHtml}</span>`;
 }
 
 
@@ -137,7 +147,7 @@ function updateNetworkLiveTimerNow(){
 }
 
 
-const initialDB={version:'13.1.0',settings:{company:'Minha Empresa',document:'',phone:'',city:'',address:'',pixKey:'',pixKeyType:'Telefone',pixMerchantName:'',pixMerchantCity:'',pixDescription:'Venda NexaGest',pixProvider:'Manual',pixProviderToken:'',pixRequireConfirmation:false,pixAutoConfirm:false,theme:'dark',accent:'#2563eb',logo:'',serverAddress:'http://192.168.0.100:3333',networkMode:false,networkRole:'standalone',networkPort:3333,syncMode:'manual',lastSyncAt:'',networkServerRunning:false,cloudSyncEnabled:false,cloudAutoBackup:true,cloudMultiPcEnabled:false,cloudLastStatus:'Preparado',cloudLastBackupAt:'',cloudLastSyncAt:'',cloudDeviceName:'PC Principal',monthlyGoal:5000,whatsappMsg:'Olá, tudo bem? Passando para falar sobre seu pedido na {empresa}.',backupProvider:'Local',backupFolder:'',backupAuto:true,updateManifestUrl:'',githubOwner:'Diogocas',githubRepo:'NexaGest',licenseServerUrl:'',licenseToken:'',licenseLastOnlineCheck:null,licenseDeviceId:'',lastUpdateInfo:null,updateDownloadStatus:'',autoUpdate:true,whatsappTemplates:{orcamento:'Olá {cliente}! Segue seu orçamento da {empresa}: {total}.',comprovante:'🧾 *COMPROVANTE DE VENDA*\n\nOlá, *{cliente}*! 👋\n\nSua compra foi finalizada com sucesso na *{empresa}*.\n\n━━━━━━━━━━━━━━━━━━\n🧾 Venda: {pedido}\n📅 Data: {data} • {hora}\n\n💰 Total: *{total}*\n💳 Pagamento: {pagamento}\n{descontoLinha}{dinheiroLinha}{pixLinha}━━━━━━━━━━━━━━━━━━\n\n📦 Itens\n{itens}\n\nObrigado pela preferência! 😊\n\n📍 {empresa}\n📱 {telefoneEmpresa}',cobranca:'Olá {cliente}! Você possui um valor em aberto de {valor} na {empresa}.',entrega:'Olá {cliente}! Sua entrega/pedido {pedido} está em andamento.',aniversario:'Olá {cliente}! A {empresa} deseja um feliz aniversário! 🎉'}},session:null,users:[{id:'admin',name:'Administrador',user:'admin',passwordHash:passwordHash('admin'),role:'Administrador',active:true,mustChangePassword:true}],products:[{id:'p1',name:'Produto Exemplo',barcode:'789000000001',category:'Geral',cost:10,sale:18,stock:20,min:5,active:true},{id:'p2',name:'Produto Exemplo 2',barcode:'789000000002',category:'Geral',cost:20,sale:35,stock:8,min:3,active:true}],clients:[{id:'c1',name:'Cliente Balcão',phone:'',city:'',address:'',creditLimit:0,notes:''}],sales:[],expenses:[],stockMoves:[],receivables:[],quotes:[],deliveries:[],nfeInvoices:[],suppliers:[{id:'s1',name:'Fornecedor Exemplo',phone:'',city:'',notes:''}],purchases:[],audit:[],accessLogs:[],cashRegisters:[]};
+const initialDB={version:'13.2.4',settings:{company:'Minha Empresa',document:'',phone:'',city:'',address:'',pixKey:'',pixKeyType:'Telefone',pixMerchantName:'',pixMerchantCity:'',pixDescription:'Venda NexaGest',pixProvider:'Manual',pixProviderToken:'',pixRequireConfirmation:false,pixAutoConfirm:false,theme:'dark',accent:'#2563eb',logo:'',serverAddress:'http://192.168.0.100:3333',networkMode:false,networkRole:'standalone',networkPort:3333,syncMode:'manual',lastSyncAt:'',networkServerRunning:false,cloudSyncEnabled:false,cloudAutoBackup:true,cloudMultiPcEnabled:false,cloudLastStatus:'Preparado',cloudLastBackupAt:'',cloudLastSyncAt:'',cloudDeviceName:'PC Principal',monthlyGoal:5000,whatsappMsg:'Olá, tudo bem? Passando para falar sobre seu pedido na {empresa}.',backupProvider:'Local',backupFolder:'',backupAuto:true,updateManifestUrl:'',githubOwner:'Diogocas',githubRepo:'NexaGest',licenseServerUrl:'',licenseToken:'',licenseLastOnlineCheck:null,licenseDeviceId:'',lastUpdateInfo:null,updateDownloadStatus:'',autoUpdate:true,whatsappTemplates:{orcamento:'Olá {cliente}! Segue seu orçamento da {empresa}: {total}.',comprovante:'🧾 *COMPROVANTE DE VENDA*\n\nOlá, *{cliente}*! 👋\n\nSua compra foi finalizada com sucesso na *{empresa}*.\n\n━━━━━━━━━━━━━━━━━━\n🧾 Venda: {pedido}\n📅 Data: {data} • {hora}\n\n💰 Total: *{total}*\n💳 Pagamento: {pagamento}\n{descontoLinha}{dinheiroLinha}{pixLinha}━━━━━━━━━━━━━━━━━━\n\n📦 Itens\n{itens}\n\nObrigado pela preferência! 😊\n\n📍 {empresa}\n📱 {telefoneEmpresa}',cobranca:'Olá {cliente}! Você possui um valor em aberto de {valor} na {empresa}.',entrega:'Olá {cliente}! Sua entrega/pedido {pedido} está em andamento.',aniversario:'Olá {cliente}! A {empresa} deseja um feliz aniversário! 🎉'}},session:null,users:[{id:'admin',name:'Administrador',user:'admin',passwordHash:passwordHash('admin'),role:'Administrador',active:true,mustChangePassword:true}],products:[{id:'p1',name:'Produto Exemplo',barcode:'789000000001',category:'Geral',cost:10,sale:18,stock:20,min:5,active:true},{id:'p2',name:'Produto Exemplo 2',barcode:'789000000002',category:'Geral',cost:20,sale:35,stock:8,min:3,active:true}],clients:[{id:'c1',name:'Cliente Balcão',phone:'',city:'',address:'',creditLimit:0,notes:''}],sales:[],expenses:[],stockMoves:[],receivables:[],quotes:[],deliveries:[],nfeInvoices:[],suppliers:[{id:'s1',name:'Fornecedor Exemplo',phone:'',city:'',notes:''}],purchases:[],audit:[],accessLogs:[],cashRegisters:[]};
 function migrate(d){d={...structuredClone(initialDB),...d,settings:{...initialDB.settings,...(d.settings||{})}};['cashRegisters','accessLogs','suppliers','purchases','quotes','deliveries','nfeInvoices','audit','stockMoves','receivables','expenses','sales','clients','products','users'].forEach(k=>d[k]=d[k]||[]);if(!d.users.length)d.users=[structuredClone(initialDB.users[0])];d.users=d.users.map(secureUser);d.settings.whatsappTemplates={...initialDB.settings.whatsappTemplates,...(d.settings.whatsappTemplates||{})};if(!/COMPROVANTE DE VENDA|━━━━━━━━|\{itens\}/i.test(d.settings.whatsappTemplates.comprovante||''))d.settings.whatsappTemplates.comprovante=initialDB.settings.whatsappTemplates.comprovante;d.version=APP_VERSION;return d}
 let db=load(),page='dashboard',cart=[],editingProduct=null,editingClient=null,editingSupplier=null,editingUser=null,range={from:today().slice(0,8)+'01',to:today()},focusAfterRender=null;
 let lookupCache={products:new Map(),clients:new Map(),suppliers:new Map()};
@@ -880,58 +890,140 @@ function commercialUpdateStatusView(){
   const progress=info.progress?` • Download: ${esc(info.progress)}%`:'';
   return `<div class="update-status-box ${cls}"><b>${title}</b><span>${details}</span><small>Fonte: ${esc(info.source||'electron-updater')} • Atual: ${esc(info.currentVersion||APP_VERSION)} • Última: ${info.checkedAt?br(info.checkedAt):'—'}${progress}</small>${hint}</div>`;
 }
+const AUTO_TRIAL_DAYS=8;
+const LICENSE_WARNING_DAYS=3;
+const LICENSE_GATE_INTERVAL_MS=30000;
 function formatLicenseDate(dateText){
   if(!dateText)return '—';
-  const d=new Date(String(dateText)+'T00:00:00');
-  return isNaN(d)?'—':d.toLocaleDateString('pt-BR');
+  const raw=String(dateText);
+  const d=raw.includes('T')?new Date(raw):new Date(raw+'T00:00:00');
+  if(isNaN(d))return '—';
+  return raw.includes('T')?d.toLocaleString('pt-BR'):d.toLocaleDateString('pt-BR');
 }
 function addLicenseDays(dateText, days){
   const base=dateText?new Date(String(dateText)+'T00:00:00'):new Date();
   base.setDate(base.getDate()+Math.max(1,Number(days||1)));
   return base.toISOString().slice(0,10);
 }
+function addLicenseMinutes(minutes){
+  return new Date(Date.now()+Math.max(1,Number(minutes||1))*60000).toISOString();
+}
 function licenseTodayKey(){return new Date().toISOString().slice(0,10)}
 function licenseDaysLeft(expiresAt){
   if(!expiresAt)return null;
-  const exp=new Date(String(expiresAt)+'T23:59:59');
+  const raw=String(expiresAt);
+  const exp=raw.includes('T')?new Date(raw):new Date(raw+'T23:59:59');
   if(isNaN(exp))return null;
   return Math.ceil((exp-new Date())/86400000);
+}
+function licenseMinutesLeft(expiresAt){
+  if(!expiresAt)return null;
+  const raw=String(expiresAt);
+  const exp=raw.includes('T')?new Date(raw):new Date(raw+'T23:59:59');
+  if(isNaN(exp))return null;
+  return Math.ceil((exp-new Date())/60000);
 }
 function ensureAutomaticTrialLicense(){
   db.settings=db.settings||{};
   if(db.settings.licenseKey || db.settings.autoTrialCreatedAt)return false;
   const start=licenseTodayKey();
-  db.settings.licenseKey='NEXA-TRIAL-7D-AUTOMATICO';
+  db.settings.licenseKey='NEXA-TRIAL-8D-AUTOMATICO';
   db.settings.licenseOwner='Teste gratuito';
   db.settings.licenseEmail='';
   db.settings.licenseType='trial';
-  db.settings.licenseDurationDays=7;
+  db.settings.licenseDurationDays=AUTO_TRIAL_DAYS;
   db.settings.licenseActivatedAt=start;
-  db.settings.licenseExpiresAt=addLicenseDays(start,7);
+  db.settings.licenseExpiresAt=addLicenseDays(start,AUTO_TRIAL_DAYS);
   db.settings.licenseActivationKey=db.settings.licenseKey;
   db.settings.autoTrialCreatedAt=start;
   db.settings.licenseStatus='trial';
-  addSystemLog('Teste automático de 7 dias criado.','success');
+  addSystemLog('Teste automático de 8 dias criado.','success');
   save();
   return true;
 }
 function effectiveLicenseState(){
   ensureAutomaticTrialLicense();
-  const clean=String(db.settings.licenseKey||'').trim().toUpperCase();
-  if(clean==='NEXA-TRIAL-7D-AUTOMATICO' || db.settings.licenseType==='trial'){
+  const clean=String(db.settings.licenseKey||'').trim();
+  const cleanUpper=clean.toUpperCase();
+  if(cleanUpper==='NEXA-TRIAL-8D-AUTOMATICO' || cleanUpper==='NEXA-TRIAL-7D-AUTOMATICO' || db.settings.licenseType==='trial'){
     const left=licenseDaysLeft(db.settings.licenseExpiresAt);
     const expired=Number.isFinite(left)&&left<0;
-    return {ok:!expired, validLicense:true, status:expired?'expired':'trial', label:expired?'Teste expirado':'Teste gratuito', type:'trial', durationDays:7, activatedAt:db.settings.licenseActivatedAt, expiresAt:db.settings.licenseExpiresAt, daysLeft:left, message:expired?'O teste gratuito expirou. Ative uma licença para continuar.':`Teste gratuito ativo. Restam ${left} dia(s).`};
+    return {ok:!expired, validLicense:true, status:expired?'expired':'trial', label:expired?'Teste expirado':'Teste gratuito', type:'trial', durationDays:AUTO_TRIAL_DAYS, activatedAt:db.settings.licenseActivatedAt, expiresAt:db.settings.licenseExpiresAt, daysLeft:left, message:expired?'O teste gratuito expirou. Ative uma licença para continuar.':`Teste gratuito ativo. Restam ${left} dia(s).`};
   }
   const validator=window.NexaGestPremium;
   return validator?.validateLicense?validator.validateLicense(db.settings.licenseKey,db.settings.licenseOwner,db.settings):{ok:!!db.settings.licenseKey,label:db.settings.licenseKey?'Licença informada':'Sem licença configurada',status:db.settings.licenseKey?'active':'none'};
 }
 function isLicenseAllowed(){return effectiveLicenseState().ok!==false}
+
+function licenseExpirationDate(expiresAt){
+  if(!expiresAt)return null;
+  const raw=String(expiresAt);
+  const exp=raw.includes('T')?new Date(raw):new Date(raw+'T23:59:59');
+  return isNaN(exp)?null:exp;
+}
+function licenseRemainingMs(state=effectiveLicenseState()){
+  const exp=licenseExpirationDate(state.expiresAt||db.settings.licenseExpiresAt);
+  if(!exp)return null;
+  return exp-new Date();
+}
+function formatLicenseRemaining(state=effectiveLicenseState()){
+  if(state.type==='permanent')return 'Licença permanente';
+  const ms=licenseRemainingMs(state);
+  if(!Number.isFinite(ms)){
+    if(state.durationMinutes)return `${state.durationMinutes} minuto(s) após ativar`;
+    if(state.durationDays)return `${state.durationDays} dia(s) após ativar`;
+    return '—';
+  }
+  if(ms<=0)return 'Licença expirada';
+  const totalSeconds=Math.floor(ms/1000);
+  const totalMinutes=Math.floor(totalSeconds/60);
+  const totalHours=Math.floor(totalMinutes/60);
+  const days=Math.floor(totalHours/24);
+  const hours=totalHours%24;
+  const minutes=totalMinutes%60;
+  const seconds=totalSeconds%60;
+  if(days>=2)return hours>0?`Restam ${days} dias e ${hours}h`:`Restam ${days} dias`;
+  if(days===1)return hours>0?`Resta 1 dia e ${hours}h`:'Resta 1 dia';
+  if(totalHours>=1)return minutes>0?`Restam ${totalHours}h ${minutes}min`:`Restam ${totalHours}h`;
+  if(totalMinutes>=1)return seconds>0?`Restam ${totalMinutes}min ${seconds}s`:`Restam ${totalMinutes}min`;
+  return `Restam ${Math.max(0,seconds)}s`;
+}
+function licenseFriendlyMessage(state=effectiveLicenseState()){
+  if(state.type==='permanent')return 'Licença permanente ativa. O NexaGest está liberado sem vencimento.';
+  if(state.ok===false)return 'A licença expirou. Seus dados estão preservados; ative uma nova licença para continuar.';
+  if(state.status==='pending')return state.durationMinutes?`Licença pronta para ativar. A contagem de ${state.durationMinutes} minuto(s) começa na primeira ativação.`:`Licença pronta para ativar. A contagem de ${state.durationDays||30} dia(s) começa na primeira ativação.`;
+  return `Licença por período ativa. ${formatLicenseRemaining(state)}.`;
+}
+function licenseGlobalWarningData(state=effectiveLicenseState()){
+  try{
+    if(!state || state.ok===false || state.type==='permanent')return null;
+    const ms=licenseRemainingMs(state);
+    if(!Number.isFinite(ms) || ms<=0)return null;
+    const dayMs=86400000;
+    if(ms>LICENSE_WARNING_DAYS*dayMs)return null;
+    const remaining=formatLicenseRemaining(state).replace(/^Restam?\s?/,'').replace(/^Resta\s?/,'');
+    let level='warn';
+    let text='⚠️ Licença vence em '+remaining;
+    if(ms<=dayMs){ level='danger'; text='🔴 Licença vence hoje'; }
+    else if(ms<=2*dayMs){ level='orange'; text='🟠 Licença vence em '+remaining; }
+    return {level,text,title:'Aviso de licença: ative uma nova licença antes do vencimento para evitar o bloqueio do NexaGest.'};
+  }catch(e){return null}
+}
+function refreshLicenseCountdownLabels(){
+  document.querySelectorAll('[data-license-countdown]').forEach(el=>{
+    try{ el.textContent=formatLicenseRemaining(effectiveLicenseState()); }catch(e){}
+  });
+  document.querySelectorAll('[data-license-message]').forEach(el=>{
+    try{ el.textContent=licenseFriendlyMessage(effectiveLicenseState()); }catch(e){}
+  });
+}
+
 function licenseWarningText(state=effectiveLicenseState()){
   if(state.type==='permanent')return '';
-  if(!Number.isFinite(state.daysLeft))return '';
-  if(state.daysLeft<0)return 'Sua licença expirou. Ative uma nova licença para continuar usando o NexaGest.';
-  if(state.daysLeft<=3)return `Atenção: sua licença vence em ${state.daysLeft} dia(s). Após o vencimento o NexaGest será bloqueado até a ativação de uma nova licença.`;
+  const ms=licenseRemainingMs(state);
+  if(Number.isFinite(ms) && ms<=0)return 'Sua licença expirou. Ative uma nova licença para continuar usando o NexaGest.';
+  if(Number.isFinite(ms) && ms<=3600000)return `Atenção: sua licença vence em ${formatLicenseRemaining(state).replace(/^Restam?\s?/,'')}. Após o vencimento o NexaGest será bloqueado até a ativação de uma nova licença.`;
+  if(Number.isFinite(state.daysLeft) && state.daysLeft<=LICENSE_WARNING_DAYS)return `Atenção: sua licença vence em ${formatLicenseRemaining(state).replace(/^Restam?\s?/,'')}. Após o vencimento o NexaGest será bloqueado até a ativação de uma nova licença.`;
   return '';
 }
 function showLicenseStartupWarningIfNeeded(){
@@ -958,12 +1050,12 @@ function ensureLicenseGateTimer(){
       alert('Sua licença expirou. Ative uma licença para continuar usando o NexaGest.');
       app();
     }
-  },60000);
+  },LICENSE_GATE_INTERVAL_MS);
 }
 function licenseBlockedView(){
   const state=effectiveLicenseState();
   const exp=formatLicenseDate(state.expiresAt||db.settings.licenseExpiresAt);
-  return `<div class="license-block-screen"><div class="login-card license-block-card"><div class="brand-large">${logo()}<div><h1>Licença expirada</h1><p class="muted">Seus dados estão preservados.</p></div></div><div class="notice"><b>🔒 O período de uso terminou.</b><br><span>Para continuar usando o NexaGest, insira uma licença válida.</span></div><div class="commercial-grid"><div class="commercial-box"><b>Status</b><span>${esc(state.label||'Expirada')}</span><small>${esc(state.message||'Ative uma nova licença.')}</small></div><div class="commercial-box"><b>Validade anterior</b><span>${esc(exp)}</span><small>O sistema completo será liberado após a ativação.</small></div></div><div class="form-grid"><div class="field wide"><label>Nova licença</label><input id="licenseKey" value="" placeholder="NEXA-... licença recebida"></div><div class="field"><label>Cliente / Responsável</label><input id="licenseOwner" value="${esc(db.settings.licenseOwner||'')}" placeholder="Nome do titular"></div><div class="field"><label>E-mail da conta</label><input id="licenseEmail" value="${esc(db.settings.licenseEmail||'')}" placeholder="cliente@email.com"></div><label class="check-row"><input type="checkbox" id="autoUpdate" ${db.settings.autoUpdate?'checked':''}> Verificar atualizações automaticamente</label><div class="field"><label>&nbsp;</label><button id="saveLicenseSettings" class="ok">Ativar licença</button></div></div><div class="row wrap"><button class="ghost" id="checkUpdatesNow">Verificar atualização</button><button class="ghost" id="logout">Sair</button></div></div></div>`;
+  return `<div class="license-block-screen"><div class="login-card license-block-card"><div class="brand-large">${logo()}<div><h1>Licença expirada</h1><p class="muted">Seus dados estão preservados.</p></div></div><div class="notice"><b>🔒 O período de uso terminou.</b><br><span>Para continuar usando o NexaGest, cole a nova licença recebida.</span></div><div class="commercial-grid"><div class="commercial-box"><b>Status</b><span>${esc(state.label||'Expirada')}</span><small>${esc(state.message||'Ative uma nova licença.')}</small></div><div class="commercial-box"><b>Validade anterior</b><span>${esc(exp)}</span><small>O sistema completo será liberado após a ativação.</small></div></div><div class="form-grid"><div class="field wide"><label>Nova licença</label><input id="licenseKey" value="" placeholder="Cole aqui a licença NEXA-..."></div><label class="check-row"><input type="checkbox" id="autoUpdate" ${db.settings.autoUpdate?'checked':''}> Verificar atualizações automaticamente</label><div class="field"><label>&nbsp;</label><button id="saveLicenseSettings" class="ok">Ativar licença</button></div></div><p class="muted small">O cliente e o e-mail são lidos automaticamente da licença gerada no NexaGest License Manager DEV.</p><div class="row wrap"><button class="ghost" id="checkUpdatesNow">Verificar atualização</button><button class="ghost" id="logout">Sair</button></div></div></div>`;
 }
 function commercialLicensePanel(){
   const result=effectiveLicenseState();
@@ -971,20 +1063,26 @@ function commercialLicensePanel(){
   const licenseType=result.type==='trial'?'Teste gratuito':(result.type==='period'?'Por período':(result.type==='permanent'?'Permanente':'—'));
   const activatedLabel=formatLicenseDate(result.activatedAt||db.settings.licenseActivatedAt);
   const expLabel=result.type==='permanent'?'Permanente':formatLicenseDate(result.expiresAt||db.settings.licenseExpiresAt);
-  const daysLabel=Number.isFinite(result.daysLeft)?(result.daysLeft>=0?`${result.daysLeft} dia(s) restante(s)`:'Expirada'):(result.durationDays?`${result.durationDays} dia(s) após ativar`:'—');
+  const remainingLabel=formatLicenseRemaining(result);
+  const friendlyMessage=licenseFriendlyMessage(result);
   const last=db.settings.lastUpdateCheckAt?br(db.settings.lastUpdateCheckAt):'Nunca verificado';
   const info=db.settings.lastUpdateInfo||{};
   const updateLabel=info.updateAvailable?'Nova versão disponível':(db.settings.autoUpdate?'Automática ligada':'Manual');
-  return `<div class="panel settings-card smart-section commercial-panel"><div class="between"><div><h3>Licença e atualização</h3><p class="muted small">Ative o NexaGest com a licença recebida. Licenças por período começam a contar somente na primeira ativação.</p></div><span class="pill ${cls}">${esc(result.label||'Status')}</span></div><div class="commercial-grid"><div class="commercial-box"><b>Status da licença</b><span>${esc(result.label||'Sem licença')}</span><small>${esc(result.message||'Informe a licença recebida para ativar o sistema.')}</small></div><div class="commercial-box"><b>Tipo da licença</b><span>${esc(licenseType)}</span><small>${esc(daysLabel)}</small></div><div class="commercial-box"><b>Validade</b><span>${esc(expLabel)}</span><small>Ativada em: ${esc(activatedLabel)}</small></div><div class="commercial-box"><b>Versão instalada</b><span>${esc(APP_VERSION)}</span><small>Última verificação: ${esc(last)}</small></div></div>${licenseWarningText(result)?`<div class="license-warning-box"><b>⚠️ Aviso de licença</b><span>${esc(licenseWarningText(result))}</span></div>`:''}<div class="form-grid"><div class="field wide"><label>Licença</label><input id="licenseKey" value="${esc(db.settings.licenseKey||'')}" placeholder="NEXA-... licença gerada pelo app DEV"></div><div class="field"><label>Cliente / Responsável</label><input id="licenseOwner" value="${esc(db.settings.licenseOwner||result.owner||'')}" placeholder="Nome do titular"></div><div class="field"><label>E-mail da conta</label><input id="licenseEmail" value="${esc(db.settings.licenseEmail||result.email||'')}" placeholder="cliente@email.com"></div><label class="check-row"><input type="checkbox" id="autoUpdate" ${db.settings.autoUpdate?'checked':''}> Verificar atualizações automaticamente</label><div class="field"><label>&nbsp;</label><button id="saveLicenseSettings">Ativar licença</button></div></div><div class="update-status-box neutral"><b>Atualizações</b><span>${esc(updateLabel)}</span><small>As funções de geração de licença ficam somente no NexaGest License Manager DEV.</small></div><div class="row wrap"><button class="ghost" id="checkUpdatesNow">Verificar atualização agora</button><button class="ghost" id="downloadAvailableUpdate">Baixar/instalar atualização</button><button class="ghost" id="openFirstUseWizard">Assistente de primeiro uso</button></div></div>`
+  const ownerDisplay=db.settings.licenseOwner||result.owner||'—';
+  const emailDisplay=db.settings.licenseEmail||result.email||'—';
+  return `<div class="panel settings-card smart-section commercial-panel"><div class="between"><div><h3>Licença e atualização</h3><p class="muted small">Ative o NexaGest colando a licença recebida. Cliente e e-mail são preenchidos automaticamente pela chave.</p></div><span class="pill ${cls}">${esc(result.label||'Status')}</span></div><div class="commercial-grid"><div class="commercial-box license-status-box"><b>Status da licença</b><span>${esc(result.ok===false?'Licença expirada':(result.type==='permanent'?'Licença permanente':'Licença ativa'))}</span><small data-license-message>${esc(friendlyMessage)}</small></div><div class="commercial-box license-countdown-box"><b>Tempo restante</b><span data-license-countdown>${esc(remainingLabel)}</span><small>Tipo: ${esc(licenseType)}</small></div><div class="commercial-box"><b>Cliente</b><span>${esc(ownerDisplay)}</span><small>${esc(emailDisplay)}</small></div><div class="commercial-box"><b>Validade</b><span>${esc(expLabel)}</span><small>Ativada em: ${esc(activatedLabel)}</small></div><div class="commercial-box"><b>Versão instalada</b><span>${esc(APP_VERSION)}</span><small>Última verificação: ${esc(last)}</small></div></div>${licenseWarningText(result)?`<div class="license-warning-box"><b>⚠️ Aviso de licença</b><span>${esc(licenseWarningText(result))}</span></div>`:''}<div class="form-grid"><div class="field wide"><label>Licença</label><input id="licenseKey" value="${esc(db.settings.licenseKey||'')}" placeholder="Cole aqui a licença NEXA-... gerada no app DEV"></div><label class="check-row"><input type="checkbox" id="autoUpdate" ${db.settings.autoUpdate?'checked':''}> Verificar atualizações automaticamente</label><div class="field"><label>&nbsp;</label><button id="saveLicenseSettings">Ativar licença</button></div></div><div class="update-status-box neutral"><b>Atualizações</b><span>${esc(updateLabel)}</span><small>As funções de geração de licença ficam somente no NexaGest License Manager DEV.</small></div><div class="row wrap"><button class="ghost" id="checkUpdatesNow">Verificar atualização agora</button><button class="ghost" id="downloadAvailableUpdate">Baixar/instalar atualização</button><button class="ghost" id="openFirstUseWizard">Assistente de primeiro uso</button></div></div>`
 }
 function saveLicenseSettings(){
   const previousKey=window.NexaGestPremium?.normalizeKey?window.NexaGestPremium.normalizeKey(db.settings.licenseKey):String(db.settings.licenseKey||'').trim().toUpperCase();
   db.settings.licenseKey=val('licenseKey').trim();
-  db.settings.licenseOwner=val('licenseOwner').trim();
-  db.settings.licenseEmail=val('licenseEmail').trim();
+  const ownerInput=document.getElementById('licenseOwner');
+  const emailInput=document.getElementById('licenseEmail');
+  if(ownerInput)db.settings.licenseOwner=ownerInput.value.trim();
+  if(emailInput)db.settings.licenseEmail=emailInput.value.trim();
   db.settings.autoUpdate=!!document.getElementById('autoUpdate')?.checked;
-  const cleanKey=window.NexaGestPremium?.normalizeKey?window.NexaGestPremium.normalizeKey(db.settings.licenseKey):String(db.settings.licenseKey||'').trim().toUpperCase();
-  if(cleanKey==='NEXA-TRIAL-7D-AUTOMATICO'){
+  const cleanKey=window.NexaGestPremium?.normalizeKey?window.NexaGestPremium.normalizeKey(db.settings.licenseKey):String(db.settings.licenseKey||'').trim();
+  const cleanKeyUpper=cleanKey.toUpperCase();
+  if(cleanKeyUpper==='NEXA-TRIAL-8D-AUTOMATICO' || cleanKeyUpper==='NEXA-TRIAL-7D-AUTOMATICO'){
     const trialState=effectiveLicenseState();
     db.settings.licenseStatus=trialState.status;
     db.settings.licenseCheckedAt=new Date().toISOString();
@@ -1002,13 +1100,14 @@ function saveLicenseSettings(){
   if(result.validLicense){
     db.settings.licenseType=result.type||'permanent';
     db.settings.licenseDurationDays=result.durationDays||'';
+    db.settings.licenseDurationMinutes=result.durationMinutes||'';
     if(result.owner) db.settings.licenseOwner=result.owner;
     if(result.email) db.settings.licenseEmail=result.email;
     if(result.id) db.settings.licenseId=result.id;
     if(result.type==='period'){
       if(result.needsActivation || db.settings.licenseActivationKey!==cleanKey || !db.settings.licenseActivatedAt || !db.settings.licenseExpiresAt){
         db.settings.licenseActivatedAt=new Date().toISOString().slice(0,10);
-        db.settings.licenseExpiresAt=addLicenseDays(db.settings.licenseActivatedAt,result.durationDays||30);
+        db.settings.licenseExpiresAt=result.durationMinutes?addLicenseMinutes(result.durationMinutes):addLicenseDays(db.settings.licenseActivatedAt,result.durationDays||30);
         db.settings.licenseActivationKey=cleanKey;
       }
     }else{
@@ -2810,7 +2909,7 @@ function aiLocalSystemStatus(){
   let company=currentCompanyName?currentCompanyName():(db.settings?.company||'Empresa');
   return [
     `Empresa atual: ${company}`,
-    `Versão do sistema: 13.1.0`,
+    `Versão do sistema: 13.1.1`,
     `Usuário logado: ${db.session?.name||'-'} (${db.session?.role||'-'})`,
     `Caixa: ${cash?'aberto desde '+br(cash.openedAt):'fechado'}`,
     `Produtos cadastrados: ${snap.products}`,

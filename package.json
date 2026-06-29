@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "13.1.0",
-  "description": "NexaGest 13.1.0 - Trial automático e bloqueio de licença",
+  "version": "13.2.5",
+  "description": "NexaGest 13.2.5 - License Manager PRO",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -66,7 +66,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "13.1.0"
+      "version": "13.2.5"
     },
     "publish": [
       {
@@ -76,6 +76,6 @@
         "releaseType": "release"
       }
     ],
-    "buildVersion": "13.1.0"
+    "buildVersion": "13.2.5"
   }
 }
