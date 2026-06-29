@@ -1,37 +1,45 @@
-# NexaGest 11.5.6 — Limpeza e Assistente Local
+# NexaGest 12.0.0 — Revisão Final Comercial
 
-## v11.5.7 - Limpeza final de interface
+Versão focada em finalização, diagnóstico e prontidão comercial do sistema desktop, sem dependência de Mobile, API online ou serviços pagos.
 
-- Removidos rótulos visíveis como rótulos técnicos e temporários das telas principais.
-- Financeiro, Dashboard, Orçamentos, Cloud e NexaGest AI ficaram com nomes comerciais limpos.
-- Badge restante de rótulo técnico no resumo financeiro removido.
-- PUBLICAR.bat, package.json e config.js atualizados para 11.5.7.
+## Principais ajustes
 
+- Versão atualizada para 12.0.0.
+- `PUBLICAR.bat` atualizado para 12.0.0.
+- `package.json` e `src/config.js` atualizados.
+- Tela de Diagnóstico com checklist de prontidão comercial.
+- Exportação de checklist comercial em TXT.
+- Documentação de checklist comercial criada em `docs/`.
+- Revisão do texto de comercialização, licença e atualização.
+- Mantido foco local/offline para evitar custo com servidor ou API.
 
-Versão de organização visual e padronização dos nomes dos módulos.
+## Documentos importantes
 
-## Ajustes realizados
+- `docs/VERSAO_12_0_REVISAO_FINAL_COMERCIAL.md`
+- `docs/CHECKLIST_COMERCIAL_12_0.md`
+- `docs/PRIMEIRO_USO.md`
+- `docs/BUILD_INSTALLER.md`
+- `docs/GITHUB_RELEASES.md`
 
-- Removidos rótulos antigos de versões nas telas.
-- Painel principal padronizado como Dashboard.
-- Módulo comercial padronizado como Orçamentos.
-- Módulo de indicadores padronizado como BI.
-- Cloud ficou sem chamadas de versão no texto da tela.
-- NexaGest AI ficou como Assistente Local.
-- Financeiro/OFX ficou sem rótulos antigos.
-- PUBLICAR.bat atualizado para 11.5.6.
+## Como testar
 
-## Observação
+```bash
+npm install
+npm start
+```
 
-Esta versão não remove funcionalidades. Ela limpa nomes, textos e marcações antigas para deixar o sistema com aparência final e mais profissional.
+## Como gerar instalador
 
+```bash
+npm run dist:win
+```
 
-## v11.5.6 - Interface limpa
+## Como publicar
 
-- Removidos rótulos comerciais/temporários das telas do usuário.
-- Dashboard com nome limpo.
-- Financeiro com nome limpo.
-- Orçamentos com nome limpo.
-- Cloud sem textos de versão na interface.
-- NexaGest AI permanece como Assistente Local.
-- PUBLICAR.bat atualizado para 11.5.6.
+Use:
+
+```bat
+PUBLICAR.bat
+```
+
+A versão padrão do publicador está configurada como `12.0.0`.

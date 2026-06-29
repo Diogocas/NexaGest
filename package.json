@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "11.5.7",
-  "description": "NexaGest 11.5.7 - limpeza final de interface e nomes comerciais",
+  "version": "12.0.0",
+  "description": "NexaGest 12.0.0 - Revisão Final Comercial",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -65,7 +65,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "11.5.7"
+      "version": "12.0.0"
     },
     "publish": [
       {
@@ -75,6 +75,6 @@
         "releaseType": "release"
       }
     ],
-    "buildVersion": "11.5.7"
+    "buildVersion": "12.0.0"
   }
 }
