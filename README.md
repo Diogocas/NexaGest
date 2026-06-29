@@ -1,45 +1,20 @@
-# NexaGest 12.0.0 — Revisão Final Comercial
-
-Versão focada em finalização, diagnóstico e prontidão comercial do sistema desktop, sem dependência de Mobile, API online ou serviços pagos.
+# NexaGest 13.1.0 — Trial automático e bloqueio de licença
 
 ## Principais ajustes
 
-- Versão atualizada para 12.0.0.
-- `PUBLICAR.bat` atualizado para 12.0.0.
-- `package.json` e `src/config.js` atualizados.
-- Tela de Diagnóstico com checklist de prontidão comercial.
-- Exportação de checklist comercial em TXT.
-- Documentação de checklist comercial criada em `docs/`.
-- Revisão do texto de comercialização, licença e atualização.
-- Mantido foco local/offline para evitar custo com servidor ou API.
+- Primeiro uso cria automaticamente um teste gratuito de 7 dias.
+- Teste gratuito libera o sistema completo durante o período.
+- Aviso automático quando faltarem 3 dias ou menos para vencer.
+- Verificação automática enquanto o app está aberto.
+- Quando vencer, o sistema bloqueia imediatamente e mantém apenas a ativação de licença disponível.
+- Os dados cadastrados não são apagados.
+- Licença por período ou permanente libera o sistema novamente.
+- `PUBLICAR.bat`, `package.json` e `src/config.js` atualizados para `13.1.0`.
 
-## Documentos importantes
+## Arquivo DEV
 
-- `docs/VERSAO_12_0_REVISAO_FINAL_COMERCIAL.md`
-- `docs/CHECKLIST_COMERCIAL_12_0.md`
-- `docs/PRIMEIRO_USO.md`
-- `docs/BUILD_INSTALLER.md`
-- `docs/GITHUB_RELEASES.md`
+O gerador de licenças continua em:
 
-## Como testar
+`tools/NexaGest-License-Manager-DEV.html`
 
-```bash
-npm install
-npm start
-```
-
-## Como gerar instalador
-
-```bash
-npm run dist:win
-```
-
-## Como publicar
-
-Use:
-
-```bat
-PUBLICAR.bat
-```
-
-A versão padrão do publicador está configurada como `12.0.0`.
+Ele gera licenças por período ou permanentes para ativar o NexaGest após o teste.

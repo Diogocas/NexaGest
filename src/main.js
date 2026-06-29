@@ -99,7 +99,7 @@ function postJsonToUrl(url, payload = {}, timeoutMs = 15000) {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'User-Agent': 'NexaGest-License/11.5.6',
+          'User-Agent': 'NexaGest-License/13.1.0',
           'Content-Length': Buffer.byteLength(body)
         },
         timeout: timeoutMs
@@ -131,7 +131,6 @@ function normalizeLicenseResponse(response = {}, fallback = {}) {
     online: true,
     status: response.status || (ok ? 'active' : 'invalid'),
     label: response.label || (ok ? 'Licença online ativa' : 'Licença online inválida'),
-    plan: response.plan || fallback.plan || 'Profissional',
     owner: response.owner || fallback.owner || '',
     email: response.email || fallback.email || '',
     expiresAt: response.expiresAt || response.expires_at || '',
@@ -1198,7 +1197,6 @@ ipcMain.handle('license-online-activate', async (_event, payload = {}) => {
       licenseKey: payload.licenseKey || '',
       owner: payload.licenseOwner || payload.owner || '',
       email: payload.licenseEmail || payload.email || '',
-      plan: payload.licensePlan || payload.plan || '',
       deviceId,
       hostname: os.hostname(),
       platform: os.platform(),

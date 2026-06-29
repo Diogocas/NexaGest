@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NexaGest License Manager DEV</title>
+<style>
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;background:#0b1220;color:#e8eefc}body{margin:0;padding:32px;background:radial-gradient(circle at top,#13233f,#070b14 60%)}.wrap{max-width:980px;margin:auto}.card{background:#101827;border:1px solid #263757;border-radius:20px;padding:24px;box-shadow:0 24px 60px #0008}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:20px}.pill{background:#123b2d;color:#20e28a;border:1px solid #1c8f61;border-radius:999px;padding:8px 12px;font-weight:800}h1{margin:0 0 8px;font-size:30px}.muted{color:#9fb0ca}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{display:flex;flex-direction:column;gap:8px}.wide{grid-column:1/-1}label{font-weight:800;color:#b9c8e2}input,select,textarea{background:#172238;color:#fff;border:1px solid #31425f;border-radius:12px;padding:13px;font-size:15px}textarea{min-height:140px;font-family:Consolas,monospace}button{border:0;border-radius:12px;background:#2563eb;color:#fff;padding:14px 18px;font-weight:900;cursor:pointer}button.secondary{background:#172238;border:1px solid #31425f}.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}.out{margin-top:20px}.ok{color:#20e28a}.warn{color:#fbbf24}.small{font-size:13px}.box{background:#0b1220;border:1px dashed #3b82f6;border-radius:14px;padding:16px;margin-top:14px}.hidden{display:none}</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="hero">
+      <div>
+        <h1>🔐 NexaGest License Manager DEV</h1>
+        <p class="muted">Ferramenta offline para gerar licenças por período ou permanentes. Use somente no seu computador de desenvolvimento.</p>
+      </div>
+      <span class="pill">DEV 13.1.0</span>
+    </div>
+    <div class="grid">
+      <div class="field"><label>Cliente / Responsável</label><input id="owner" placeholder="Ex.: Mercado Silva"></div>
+      <div class="field"><label>E-mail</label><input id="email" placeholder="cliente@email.com"></div>
+      <div class="field"><label>Tipo</label><select id="type" onchange="toggleDays()"><option value="period" selected>Por período</option><option value="permanent">Permanente</option></select></div>
+      <div class="field" id="daysField"><label>Dias da licença</label><select id="days"><option>7</option><option>15</option><option selected>30</option><option>90</option><option>180</option><option>365</option></select></div>
+      <div class="field"><label>Dias personalizados</label><input id="customDays" type="number" min="1" placeholder="opcional"></div>
+      <div class="field"><label>ID interno/opcional</label><input id="id" placeholder="automático"></div>
+      <div class="field wide"><label>Licença gerada</label><textarea id="license" readonly placeholder="Clique em Gerar licença"></textarea></div>
+    </div>
+    <div class="row">
+      <button onclick="generate()">Gerar licença</button>
+      <button class="secondary" onclick="copyKey()">Copiar licença</button>
+      <button class="secondary" onclick="clearForm()">Limpar</button>
+    </div>
+    <div class="box small muted">
+      <b>Como usar:</b> gere a licença aqui, copie a chave e envie ao cliente. No NexaGest instalado, o cliente cola a licença e clica em <b>Ativar licença</b>. Licenças por período começam a contar somente na primeira ativação do cliente, não na data em que você gerou a chave.
+    </div>
+  </div>
+</div>
+<script>
+const SECRET='NEXAGEST-LIC-OFFLINE-13';
+function checksum(text){let h=2166136261;for(const ch of String(text||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0).toString(36).toUpperCase().slice(0,8).padStart(8,'0')}
+function b64url(text){return btoa(unescape(encodeURIComponent(text))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function ymd(d){return d.toISOString().slice(0,10)}
+function toggleDays(){const period=document.getElementById('type').value==='period';document.getElementById('daysField').style.opacity=period?'1':'.45';document.getElementById('days').disabled=!period;document.getElementById('customDays').disabled=!period}
+function getDays(){const custom=Number(document.getElementById('customDays').value||0);return Math.max(1,custom||Number(document.getElementById('days').value||30))}
+function generate(){
+  const owner=document.getElementById('owner').value.trim()||'Cliente NexaGest';
+  const email=document.getElementById('email').value.trim();
+  const type=document.getElementById('type').value;
+  const payload={id:document.getElementById('id').value.trim()||('LIC-'+Date.now().toString(36).toUpperCase()),owner,email,type,issuedAt:ymd(new Date())};
+  if(type==='period')payload.durationDays=getDays();
+  const json=JSON.stringify(payload);
+  const key='NEXA-'+b64url(json)+'.'+checksum(json+SECRET);
+  document.getElementById('license').value=key;
+}
+async function copyKey(){const v=document.getElementById('license').value;if(!v)return alert('Gere a licença primeiro.');try{await navigator.clipboard.writeText(v);alert('Licença copiada.')}catch(e){document.getElementById('license').select();document.execCommand('copy');alert('Licença copiada.')}}
+function clearForm(){['owner','email','id','license','customDays'].forEach(id=>document.getElementById(id).value='');document.getElementById('days').value=30;document.getElementById('type').value='period';toggleDays()}
+toggleDays();
+</script>
+</body>
+</html>

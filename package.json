@@ -1,7 +1,7 @@
 {
   "name": "nexagest",
-  "version": "12.0.0",
-  "description": "NexaGest 12.0.0 - Revisão Final Comercial",
+  "version": "13.1.0",
+  "description": "NexaGest 13.1.0 - Trial automático e bloqueio de licença",
   "main": "src/main.js",
   "author": "LivePlay",
   "license": "MIT",
@@ -40,7 +40,8 @@
       "docs/**/*",
       "updates/**/*",
       "build/**/*",
-      "GERAR-INSTALADOR.bat"
+      "GERAR-INSTALADOR.bat",
+      "tools/**/*"
     ],
     "asar": true,
     "win": {
@@ -65,7 +66,7 @@
     "extraMetadata": {
       "name": "nexagest",
       "productName": "NexaGest",
-      "version": "12.0.0"
+      "version": "13.1.0"
     },
     "publish": [
       {
@@ -75,6 +76,6 @@
         "releaseType": "release"
       }
     ],
-    "buildVersion": "12.0.0"
+    "buildVersion": "13.1.0"
   }
 }
